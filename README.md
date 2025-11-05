@@ -1,0 +1,27 @@
+## Comando para executar o jogo
+>``gcc hello.c -o hello $(pkg-config allegro-5 allegro_font-5 --libs --cflags)``
+> Versão utilizada: 5.2
+
+### TO-DO:
+1. Implementar fundo
+2. Como colocar sprites
+3. Definir obstáculos
+4. 
+
+### Allegro Addons:
+
+allegro_image -> allegro
+allegro_primitives -> allegro
+allegro_color -> allegro
+
+allegro_font -> allegro
+allegro_ttf -> allegro_font -> allegro
+
+allegro_audio -> allegro
+allegro_acodec -> allegro_audio -> allegro
+allegro_video -> allegro_audio -> allegro
+
+allegro_memfile -> allegro
+allegro_physfs -> allegro
+
+allegro_native_dialog -> allegro

@@ -6,7 +6,11 @@
 1. Implementar fundo
 2. Como colocar sprites
 3. Definir obstáculos
-4. 
+4. Menu
+    a. Aumentar fonte
+    b. Escalonar fundo
+    c. Quadrado do menu
+    d. Lógica dos botão
 
 ### Allegro Addons:
 

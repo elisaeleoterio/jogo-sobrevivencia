@@ -126,6 +126,25 @@ int main() {
         matarProgramaErro(4);
     }
 
+    ALLEGRO_BITMAP *menu_square = al_load_bitmap("assets/images/menu_placeholder.png");
+    if (!menu_square) {
+        al_destroy_display(display);
+        al_destroy_event_queue(fila_eventos);
+        al_destroy_timer(timer);
+        al_destroy_bitmap(background);
+        matarProgramaErro(4);
+    }
+
+    ALLEGRO_BITMAP *mouse_cursor = al_load_bitmap("assets/images/mouse-placeholder.png");
+    if (!mouse_cursor) {
+        al_destroy_display(display);
+        al_destroy_event_queue(fila_eventos);
+        al_destroy_timer(timer);
+        al_destroy_bitmap(background);
+        al_destroy_bitmap(menu_square);
+        matarProgramaErro(4);
+    }
+
     ALLEGRO_FONT *font = al_load_font("assets/fonts/Gafata-Regular.ttf", 36, 0);
     if (!font) {
         al_destroy_display(display);
@@ -163,21 +182,22 @@ int main() {
         // Armazena a altura a font
         int font_height = al_get_font_line_height(font);
 
-        // int start_y_top, start_y_bottom, exit_y_top, exit_y_bottom, hitbox_half_width;
-
         // Ponto X central
         float menu_x = largura / 2.0; 
-
-        // Ponto Y central (base do menu)
+        // Ponto Y central
         float menu_y = altura / 2.0;
 
+        // Tamanho do bloco do menu
+        float menu_width = 2 * largura/3; // Largura total do bloco do menu
+        float menu_height = 2 * altura/3; // Altura total do bloco do menu
+
         // Espaçamento entre os itens
-        float padding = font_height * 0.5; // Meia linha de espaço
+        float padding = font_height * 1; // Meia linha de espaço
 
         // Posições Y para desenhar o texto (al_draw_text usa o Y do topo)
         float title_y = menu_y - font_height - padding;
         float start_y = menu_y + padding;
-        float exit_y = start_y + font_height; // Uma linha de fonte abaixo de "START"
+        float exit_y = start_y + padding; 
 
 
 
@@ -207,13 +227,11 @@ int main() {
                 float exit_y2 = exit_y + font_height; // Y da base
             
                 // Verificação se o mouse está encima de algum botão
-                if (mouse_x >= start_x1 && mouse_x <= start_x2 && mouse_y >= start_y1 && mouse_y <= start_y2) {
+                if ((mouse_x >= start_x1 && mouse_x <= start_x2) && (mouse_y >= start_y1 && mouse_y <= start_y2)) {
                     selected_option = 1; 
-                } 
-                if (mouse_x >= exit_x1 && mouse_x <= exit_x2 && mouse_y >= exit_y1 && mouse_y <= exit_y2) {
-                        selected_option = 2;
-                }
-                else {
+                } else if ((mouse_x >= exit_x1 && mouse_x <= exit_x2) && (mouse_y >= exit_y1 && mouse_y <= exit_y2)) {
+                    selected_option = 2;
+                } else {
                     selected_option = 0;
                 }
                 redraw = true;
@@ -242,18 +260,29 @@ int main() {
             default:
                 break;
         }
+
         if (redraw && al_is_event_queue_empty(fila_eventos)) {
             redraw = false;
 
-            
             // Definir cores
             ALLEGRO_COLOR fundo = al_map_rgb(14, 17, 22);
             ALLEGRO_COLOR cor_normal = al_map_rgb(200, 200, 200); // Cinza claro
             ALLEGRO_COLOR cor_selecionado = al_map_rgb(251, 116, 168); // Happy Pink
             ALLEGRO_COLOR mouse = al_map_rgb(255, 0, 127); // Bright Pink
             
+            // Reseta para a cor de fundo
             al_clear_to_color(fundo);
-            al_draw_bitmap(background, 0, 0, 0);
+
+            
+            // Desenha a imagem de fundo
+            int background_width = al_get_bitmap_width(background);
+            int background_heitgh = al_get_bitmap_height(background);
+            al_draw_scaled_bitmap(background, 0, 0, background_width, background_heitgh, 0, 0, largura, altura, ALLEGRO_MAG_LINEAR);
+            
+            // Desenha bloco do menu
+            int menu_square_width = al_get_bitmap_width(menu_square);
+            int menu_square_height = al_get_bitmap_height(menu_square);
+            al_draw_scaled_bitmap(menu_square, 0, 0, menu_square_width, menu_square_height, menu_x - largura/3, menu_y - altura/3, 2 * largura/3, 2* altura/3, ALLEGRO_MIN_LINEAR);
 
             // Título
             al_draw_text(font, cor_normal, menu_x, title_y, ALLEGRO_ALIGN_CENTER, "MENU");
@@ -263,7 +292,13 @@ int main() {
             al_draw_text(font, (selected_option == 2) ? cor_selecionado : cor_normal, menu_x, exit_y, ALLEGRO_ALIGN_CENTER, "EXIT");
 
             // Desenhar mouse falso
-            al_draw_text(font, mouse, mouse_x, mouse_y, 0, "X");
+            // Desenha bloco do menu
+            int mouse_width = al_get_bitmap_width(mouse_cursor);
+            int mouse_height = al_get_bitmap_height(mouse_cursor);
+            al_draw_scaled_bitmap(mouse_cursor, 0, 0, mouse_width, mouse_height, mouse_x, mouse_y, mouse_width * 0.15, mouse_height * 0.15, ALLEGRO_MIN_LINEAR);     
+            
+            
+            // al_draw_text(font, mouse, mouse_x, mouse_y, 0, "X");
 
             // Copies or updates the front and back buffers so that what has been drawn 
             // previously on the currently selected display becomes visible on screen. 

@@ -11,6 +11,7 @@
     b. Escalonar fundo
     c. Quadrado do menu
     d. Lógica dos botão
+5. Função modular de verificação de colisão
 
 ### Allegro Addons:
 

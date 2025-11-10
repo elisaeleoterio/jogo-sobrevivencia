@@ -2,6 +2,7 @@
 #include <allegro5/allegro.h>
 #include <allegro5/allegro_image.h> // Add-on de Imagem
 #include <allegro5/allegro_font.h>   // Add-on de Fonte
+#include <allegro5/allegro_ttf.h>
 
 // FUNÇÃO DE ERRO
 void matarProgramaErro(int codigo) {
@@ -37,6 +38,12 @@ void inicializar() {
     if (!al_init_font_addon()) {
         matarProgramaErro(1);
     }
+
+    if (!al_init_ttf_addon())
+    {
+        matarProgramaErro(1);
+    }
+    
 
     if (!al_install_mouse()) {
         matarProgramaErro(1);
@@ -119,7 +126,7 @@ int main() {
         matarProgramaErro(4);
     }
 
-    ALLEGRO_FONT *font = al_create_builtin_font();
+    ALLEGRO_FONT *font = al_load_font("assets/fonts/Gafata-Regular.ttf", 36, 0);
     if (!font) {
         al_destroy_display(display);
         al_destroy_event_queue(fila_eventos);
@@ -153,7 +160,27 @@ int main() {
     // Loop principal do jogo
     while (!game_done) {
         
-        int start_y_top, start_y_bottom, exit_y_top, exit_y_bottom, hitbox_half_width;
+        // Armazena a altura a font
+        int font_height = al_get_font_line_height(font);
+
+        // int start_y_top, start_y_bottom, exit_y_top, exit_y_bottom, hitbox_half_width;
+
+        // Ponto X central
+        float menu_x = largura / 2.0; 
+
+        // Ponto Y central (base do menu)
+        float menu_y = altura / 2.0;
+
+        // Espaçamento entre os itens
+        float padding = font_height * 0.5; // Meia linha de espaço
+
+        // Posições Y para desenhar o texto (al_draw_text usa o Y do topo)
+        float title_y = menu_y - font_height - padding;
+        float start_y = menu_y + padding;
+        float exit_y = start_y + font_height; // Uma linha de fonte abaixo de "START"
+
+
+
         ALLEGRO_EVENT evento;
         // Espera por um evento (do usuário ou do timer)
         al_wait_for_event(fila_eventos, &evento);
@@ -161,29 +188,32 @@ int main() {
         switch (evento.type) {
             // Realiza esse evento a cada tique do timer - Verificação da seleção das opções do menu
             case ALLEGRO_EVENT_TIMER: 
-                // Define o meio da tela
-                int centro = largura/2; 
-                
-                // Define posição dos botões (hitboxes)
+
+                // Obter as larguras dos textos
+                float start_text_width = al_get_text_width(font, "START");
+                float exit_text_width = al_get_text_width(font, "EXIT");
+
+                // Definir as áreas das hitboxes
                 // START
-                int start_y_top = altura/2 + 8; // define onde o topo da hitbox fica
-                int start_y_bottom = start_y_top + 16; // define onde a parte de baixo da hitbox fica
+                float start_x1 = menu_x - (start_text_width / 2.0);
+                float start_x2 = menu_x + (start_text_width / 2.0);
+                float start_y1 = start_y; // Y do topo (usado no al_draw_text)
+                float start_y2 = start_y + font_height; // Y da base
+
                 // EXIT
-                int exit_y_top = start_y_bottom + 16; // define onde o topo da hitbox fica
-                int exit_y_bottom = exit_y_top + 16; // define onde a parte de baixo da hitbox fica
-                
-                int hitbox_half_width = 60; // Define a metade da largura da hitbox (total de 120px)
-                
+                float exit_x1 = menu_x - (exit_text_width / 2.0);
+                float exit_x2 = menu_x + (exit_text_width / 2.0);
+                float exit_y1 = exit_y; // Y do topo
+                float exit_y2 = exit_y + font_height; // Y da base
+            
                 // Verificação se o mouse está encima de algum botão
-                if (mouse_x >= centro - hitbox_half_width && mouse_x <= centro + hitbox_half_width) {
-                    if (mouse_y >= start_y_top && mouse_y <= start_y_bottom) {
-                        // Opção selecionada é o START
-                        selected_option = 1; 
-                    } else if (mouse_y >= exit_y_top && mouse_y <= exit_y_bottom) {
-                        // Opção selecionada é o EXIT
+                if (mouse_x >= start_x1 && mouse_x <= start_x2 && mouse_y >= start_y1 && mouse_y <= start_y2) {
+                    selected_option = 1; 
+                } 
+                if (mouse_x >= exit_x1 && mouse_x <= exit_x2 && mouse_y >= exit_y1 && mouse_y <= exit_y2) {
                         selected_option = 2;
-                    }
-                } else {
+                }
+                else {
                     selected_option = 0;
                 }
                 redraw = true;
@@ -225,27 +255,21 @@ int main() {
             al_clear_to_color(fundo);
             al_draw_bitmap(background, 0, 0, 0);
 
-            // Desenhar textos na tela
             // Título
-            al_draw_text(font, cor_normal, largura/2, altura/2 + 50, ALLEGRO_ALIGN_CENTER, "MENU");
+            al_draw_text(font, cor_normal, menu_x, title_y, ALLEGRO_ALIGN_CENTER, "MENU");
             // START
-            al_draw_text(font, (selected_option == 1) ? cor_selecionado : cor_normal, largura/2, altura/2, ALLEGRO_ALIGN_CENTER, "START");
+            al_draw_text(font, (selected_option == 1) ? cor_selecionado : cor_normal, menu_x, start_y, ALLEGRO_ALIGN_CENTER, "START");
             // EXIT
-            al_draw_text(font, (selected_option == 2) ? cor_selecionado : cor_normal, largura/2, altura/2 + 80, ALLEGRO_ALIGN_CENTER, "EXIT");
+            al_draw_text(font, (selected_option == 2) ? cor_selecionado : cor_normal, menu_x, exit_y, ALLEGRO_ALIGN_CENTER, "EXIT");
 
             // Desenhar mouse falso
-            al_draw_text(font, mouse, mouse_x, mouse_y, 0, "O");
+            al_draw_text(font, mouse, mouse_x, mouse_y, 0, "X");
 
             // Copies or updates the front and back buffers so that what has been drawn 
             // previously on the currently selected display becomes visible on screen. 
             al_flip_display();
         }
     }
-        // Evento 1: Se o timer disparar (é hora de um novo frame)
-        // Evento 2: Se o usuário fechar a janela
-        // Evento 3: Se o mouse se mover
-        // Evento 4: Se o usuário clicar
-        // --- Seção de Desenho (Render) ---
 
     // Destroi variáveis para finalizar o programa
     al_destroy_bitmap(background);

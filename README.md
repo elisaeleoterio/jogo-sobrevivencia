@@ -1,5 +1,5 @@
 ## Comando para executar o jogo
->``gcc hello.c -o hello $(pkg-config allegro-5 allegro_font-5 --libs --cflags)``
+>``gcc menu.c -o menu $(pkg-config --cflags --libs allegro-5 allegro_image-5 allegro_font-5)``
 > Versão utilizada: 5.2
 
 ### TO-DO:

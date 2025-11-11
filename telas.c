@@ -1,161 +1,50 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <allegro5/allegro.h>
 #include <allegro5/allegro_image.h> // Add-on de Imagem
 #include <allegro5/allegro_font.h>   // Add-on de Fonte
 #include <allegro5/allegro_ttf.h>
 
-// FUNÇÃO DE ERRO
-void matarProgramaErro(int codigo) {
-    switch (codigo) {
-    case 1:
-        fprintf(stderr, "Erro de inicialização.\n");
-        exit(1);
-        break;
-    case 2:
-        fprintf(stderr, "Erro de chamada de função do allegro.\n");
-        exit(1);
-    case 3:
-        fprintf(stderr, "Ponteiro Nulo.\n");
-        exit(1);
-    case 4:
-        fprintf(stderr, "Erro de criação de variável.\n");
-        exit(1);
-    default:
-        break;
-    }
-}
+#include "erros.h"
+#include "inicio.h"
 
-
-void inicializar() {
-    if (!al_init()) {
-        matarProgramaErro(1);
-    }
-
-    if (!al_init_image_addon()) {
-        matarProgramaErro(1);
-    }
-
-    if (!al_init_font_addon()) {
-        matarProgramaErro(1);
-    }
-
-    if (!al_init_ttf_addon())
-    {
-        matarProgramaErro(1);
-    }
-    
-
-    if (!al_install_mouse()) {
-        matarProgramaErro(1);
-    }
-
-    if (!al_install_keyboard()) {
-        matarProgramaErro(1);
-    }
-    
-}
-
-ALLEGRO_DISPLAY *criar_display(int *largura, int *altura) {
-    if (!largura || !altura) {
+int menu(ALLEGRO_DISPLAY *display, ALLEGRO_EVENT_QUEUE *fila_eventos, ALLEGRO_TIMER *timer, int altura, int largura) {
+    if (!display || !fila_eventos || !timer) {
         matarProgramaErro(3);
     }
     
-    // Describes a monitor’s size and position relative to other monitors. 
-    // x1, y1 will be 0, 0 on the primary display. 
-    // Other monitors can have negative values if they are to the left or above the primary display. 
-    // x2, y2 are the coordinates one beyond the bottom right pixel, so that x2-x1 gives 
-    // the width and y2-y1 gives the height of the display.
-
-    // Pegar a informação do monitor em que o jogo será rodado
-    // 0 indica o monitor principal
-    ALLEGRO_MONITOR_INFO monitor_info;
-    if (!al_get_monitor_info(0, &monitor_info)) {
-        matarProgramaErro(2);
-    }
-
-    // Definir a altura e largura do monitor
-    *largura = monitor_info.x2 - monitor_info.x1;
-    *altura = monitor_info.y2 - monitor_info.y1;
-
-    // Setar a flag de FULLSCREEN_WINDOW - faz com que consuma a tela toda, tirando as bordas
-    al_set_new_display_flags(ALLEGRO_FULLSCREEN_WINDOW);
-
-    ALLEGRO_DISPLAY *display = al_create_display(*largura, *altura);
-    if (!display) {
-        matarProgramaErro(4);
-    }
-
-    return display;
-
-}
-
-
-
-int main() {
-    
-    // Inicialização e criação de variáveis do programa
-    inicializar();
-
-    // Criação do display do jogo e definição da largura e altura da tela
-    int largura, altura;
-    ALLEGRO_DISPLAY *display = criar_display(&largura, &altura);
-    if (!display) {
-        matarProgramaErro(4);
-    }
-    
-    // Criação da fila de eventos
-    ALLEGRO_EVENT_QUEUE *fila_eventos = al_create_event_queue();
-    if (!fila_eventos) {
-        al_destroy_display(display);
-        matarProgramaErro(4);
-    }
-
-    // Cria um timer (relógio) do jogo para rodar a 60 FPS (frames per second)
-    ALLEGRO_TIMER *timer = al_create_timer(1.0 / 60.0);
-    if (!timer) {
-        al_destroy_display(display);
-        al_destroy_event_queue(fila_eventos);
-        matarProgramaErro(4);
-    }
-
+    // Carrega imagem de fundo do menu
     ALLEGRO_BITMAP *background = al_load_bitmap("assets/images/background-placeholder.jpg");
     if (!background) {
-        al_destroy_display(display);
-        al_destroy_event_queue(fila_eventos);
-        al_destroy_timer(timer);
         matarProgramaErro(4);
     }
 
+    // Carrega imagem de destaque do menu
     ALLEGRO_BITMAP *menu_square = al_load_bitmap("assets/images/menu_placeholder.png");
     if (!menu_square) {
-        al_destroy_display(display);
-        al_destroy_event_queue(fila_eventos);
-        al_destroy_timer(timer);
         al_destroy_bitmap(background);
         matarProgramaErro(4);
     }
 
+    // Carrega imagem que irá substituir o cursor do mouse
     ALLEGRO_BITMAP *mouse_cursor = al_load_bitmap("assets/images/mouse-placeholder.png");
     if (!mouse_cursor) {
-        al_destroy_display(display);
-        al_destroy_event_queue(fila_eventos);
-        al_destroy_timer(timer);
         al_destroy_bitmap(background);
         al_destroy_bitmap(menu_square);
         matarProgramaErro(4);
     }
 
+    // Carrega a fonte que será utilizada
     ALLEGRO_FONT *font = al_load_font("assets/fonts/Gafata-Regular.ttf", 36, 0);
     if (!font) {
-        al_destroy_display(display);
-        al_destroy_event_queue(fila_eventos);
-        al_destroy_timer(timer);
         al_destroy_bitmap(background);
+        al_destroy_bitmap(menu_square);
+        al_destroy_bitmap(mouse_cursor);
         matarProgramaErro(4);
     }
 
     // Variáveis de estado do menu
-    bool game_done = false;
+    bool menu_done = false;
     // Flag para controlar quando desenhar na tela
     bool redraw = true; 
 
@@ -165,19 +54,8 @@ int main() {
     // 0 = nenhum, 1 = Start, 2 = Exit
     int selected_option = 0; 
 
-    // Registra as fontes dos eventos buscados no programa
-    al_register_event_source(fila_eventos, al_get_display_event_source(display)); // Eventos da tela
-    al_register_event_source(fila_eventos, al_get_timer_event_source(timer));     // Eventos do timer (FPS)
-    al_register_event_source(fila_eventos, al_get_mouse_event_source());          // Eventos do mouse
-
-    // Esconde o cursor do mouse
-    al_hide_mouse_cursor(display);
-
-    // Inicia o timer
-    al_start_timer(timer);
-
-    // Loop principal do jogo
-    while (!game_done) {
+    // Loop principal do menu
+    while (!menu_done) {
         
         // Armazena a altura a font
         int font_height = al_get_font_line_height(font);
@@ -248,14 +126,14 @@ int main() {
                 // TESTE - NÃO ESPECIFICANDO QUAL BOTÃO FOI PRESSIONADO DO MOUSE
                 if (selected_option == 1) {
                     printf("Botão START pressionado.\n");
-                    game_done = true;
+                    menu_done = true;
                 } else if (selected_option == 2) {
                     printf("Botão EXIT selecionado.\n");
-                    game_done = true;
+                    menu_done = true;
                 }
                 break;
             case ALLEGRO_EVENT_DISPLAY_CLOSE:
-                game_done = true;
+                menu_done = true;
                 break;
             default:
                 break;
@@ -295,11 +173,8 @@ int main() {
             // Desenha bloco do menu
             int mouse_width = al_get_bitmap_width(mouse_cursor);
             int mouse_height = al_get_bitmap_height(mouse_cursor);
-            al_draw_scaled_bitmap(mouse_cursor, 0, 0, mouse_width, mouse_height, mouse_x, mouse_y, mouse_width * 0.15, mouse_height * 0.15, ALLEGRO_MIN_LINEAR);     
+            al_draw_scaled_bitmap(mouse_cursor, 0, 0, mouse_width, mouse_height, mouse_x, mouse_y, mouse_width * 0.08, mouse_height * 0.08, ALLEGRO_MIN_LINEAR);     
             
-            
-            // al_draw_text(font, mouse, mouse_x, mouse_y, 0, "X");
-
             // Copies or updates the front and back buffers so that what has been drawn 
             // previously on the currently selected display becomes visible on screen. 
             al_flip_display();
@@ -307,12 +182,10 @@ int main() {
     }
 
     // Destroi variáveis para finalizar o programa
+    al_destroy_bitmap(mouse_cursor);
+    al_destroy_bitmap(menu_square);
     al_destroy_bitmap(background);
     al_destroy_font(font);
-    al_destroy_timer(timer);
-    al_destroy_event_queue(fila_eventos);
-    al_destroy_display(display);
 
-    printf("Fim do jogo.\n");
-    return 0;
+    return selected_option;
 }

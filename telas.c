@@ -189,3 +189,14 @@ int menu(ALLEGRO_DISPLAY *display, ALLEGRO_EVENT_QUEUE *fila_eventos, ALLEGRO_TI
 
     return selected_option;
 }
+
+int fase_zero(ALLEGRO_DISPLAY *display, ALLEGRO_EVENT_QUEUE *fila_eventos, ALLEGRO_TIMER *timer, int altura, int largura) {
+    if (!display || !fila_eventos || !timer) {
+        matarProgramaErro(3);
+    }
+
+    // Carregar imagem de fundo
+    // Carregar sprite
+    // Carregar obstáculos
+    // Definir game over
+}

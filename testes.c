@@ -108,6 +108,9 @@ int main() {
     // Inicialização e criação de variáveis do programa
     inicializar();
 
+    al_set_new_display_option(ALLEGRO_SAMPLE_BUFFERS, 1, ALLEGRO_SUGGEST);
+    al_set_new_display_option(ALLEGRO_SAMPLES, 8, ALLEGRO_SUGGEST);
+    al_set_new_bitmap_flags(ALLEGRO_MIN_LINEAR | ALLEGRO_MAG_LINEAR); 
     // Criação do display do jogo e definição da largura e altura da tela
     int largura, altura;
     ALLEGRO_DISPLAY *display = criar_display(&largura, &altura);
@@ -158,7 +161,7 @@ int main() {
     // Posição inicial do sprite
     float jogador_x = 100;
     float jogador_y = 100;
-    float vel_jogador = 5;
+    float vel_jogador = 10;
 
     // Posição inicial do background
     float back_x = 0;
@@ -179,7 +182,7 @@ int main() {
                 // al_draw_bitmap(background, 0, 0, 0);
                 redraw = true;
                 break;
-            case ALLEGRO_EVENT_KEY_DOWN:
+            case ALLEGRO_EVENT_KEY_CHAR:
                 printf("Input do teclado.\n");
                 switch (evento.keyboard.keycode) {
                     case ALLEGRO_KEY_RIGHT: // Nunca vou alterar a posição do jogador, só da tela??
@@ -216,7 +219,7 @@ int main() {
             ALLEGRO_COLOR fundo = al_map_rgb(14, 17, 22);
             ALLEGRO_COLOR cor_normal = al_map_rgb(200, 200, 200); // Cinza claro
             ALLEGRO_COLOR cor_selecionado = al_map_rgb(251, 116, 168); // Happy Pink
-            ALLEGRO_COLOR mouse = al_map_rgb(255, 0, 127); // Bright Pink
+            // ALLEGRO_COLOR mouse = al_map_rgb(255, 0, 127); // Bright Pink
             ALLEGRO_COLOR ceu = al_map_rgb(135, 206, 235);
             
             // Reseta para a cor de fundo

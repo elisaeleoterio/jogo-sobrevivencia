@@ -8,7 +8,7 @@
 #include "erros.h"
 #include "inicio.h"
 
-int menu(ALLEGRO_DISPLAY *display, ALLEGRO_EVENT_QUEUE *fila_eventos, ALLEGRO_TIMER *timer, int altura, int largura);
+int menu(struct mundo *mundo);
 int fase_zero(ALLEGRO_DISPLAY *display, ALLEGRO_EVENT_QUEUE *fila_eventos, ALLEGRO_TIMER *timer, int altura, int largura);
 int fase_um(ALLEGRO_DISPLAY *display, ALLEGRO_EVENT_QUEUE *fila_eventos, ALLEGRO_TIMER *timer, int altura, int largura);
 int fase_dois(ALLEGRO_DISPLAY *display, ALLEGRO_EVENT_QUEUE *fila_eventos, ALLEGRO_TIMER *timer, int altura, int largura);

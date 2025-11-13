@@ -19,6 +19,8 @@ void matarProgramaErro(int codigo) {
     case 4:
         fprintf(stderr, "Erro de criação de variável.\n");
         exit(1);
+    case 5:
+        fprintf(stderr, "Erro de alocação de memóra.\n");
     default:
         break;
     }

@@ -5,6 +5,35 @@
 #include "erros.h"
 #include "inicio.h"
 
+
+// Attibuir variáveis ao mundo
+struct mundo *criar_mundo() {
+    struct mundo *mundo = malloc(sizeof(struct mundo));
+    if (!mundo) {
+        matarProgramaErro(5);
+    }
+
+    mundo->display = criar_display(mundo->largura, mundo->altura);
+    if (!mundo->display) {
+        matarProgramaErro(4);
+    }
+    
+    mundo->timer = al_create_timer(1.0 / 60.0); // Roda em 60 FPS
+    if (!mundo->timer) {
+        al_destroy_display(mundo->display);
+        matarProgramaErro(4);
+    }
+
+    mundo->fila_eventos = al_create_event_queue();
+    if (!mundo->fila_eventos) {
+        al_destroy_display(mundo->display);
+        al_destroy_timer(mundo->timer);
+        matarProgramaErro(4);
+    }
+    
+    
+
+}
 // FUNÇÕES DE INICIALIZAÇÃO DO JOGO E DAS TELAS (ADDONS E VARIÁVEIS)
 
 void inicializar() {

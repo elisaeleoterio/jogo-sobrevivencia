@@ -8,8 +8,8 @@
 #include "erros.h"
 #include "inicio.h"
 
-int menu(ALLEGRO_DISPLAY *display, ALLEGRO_EVENT_QUEUE *fila_eventos, ALLEGRO_TIMER *timer, int altura, int largura) {
-    if (!display || !fila_eventos || !timer) {
+int menu(struct mundo *mundo) {
+    if (!mundo) {
         matarProgramaErro(3);
     }
     
@@ -61,13 +61,13 @@ int menu(ALLEGRO_DISPLAY *display, ALLEGRO_EVENT_QUEUE *fila_eventos, ALLEGRO_TI
         int font_height = al_get_font_line_height(font);
 
         // Ponto X central
-        float menu_x = largura / 2.0; 
+        float menu_x = mundo->largura / 2.0; 
         // Ponto Y central
-        float menu_y = altura / 2.0;
+        float menu_y = mundo->altura / 2.0;
 
-        // Tamanho do bloco do menu
-        float menu_width = 2 * largura/3; // Largura total do bloco do menu
-        float menu_height = 2 * altura/3; // Altura total do bloco do menu
+        // // Tamanho do bloco do menu
+        // float menu_width = 2 * mundo->largura / 3; // Largura total do bloco do menu
+        // float menu_height = 2 * mundo->altura /3; // Altura total do bloco do menu
 
         // Espaçamento entre os itens
         float padding = font_height * 1; // Meia linha de espaço
@@ -81,12 +81,11 @@ int menu(ALLEGRO_DISPLAY *display, ALLEGRO_EVENT_QUEUE *fila_eventos, ALLEGRO_TI
 
         ALLEGRO_EVENT evento;
         // Espera por um evento (do usuário ou do timer)
-        al_wait_for_event(fila_eventos, &evento);
+        al_wait_for_event(mundo->fila_eventos, &evento);
 
         switch (evento.type) {
             // Realiza esse evento a cada tique do timer - Verificação da seleção das opções do menu
             case ALLEGRO_EVENT_TIMER: 
-
                 // Obter as larguras dos textos
                 float start_text_width = al_get_text_width(font, "START");
                 float exit_text_width = al_get_text_width(font, "EXIT");
@@ -139,28 +138,28 @@ int menu(ALLEGRO_DISPLAY *display, ALLEGRO_EVENT_QUEUE *fila_eventos, ALLEGRO_TI
                 break;
         }
 
-        if (redraw && al_is_event_queue_empty(fila_eventos)) {
+        if (redraw && al_is_event_queue_empty(mundo->fila_eventos)) {
             redraw = false;
 
             // Definir cores
             ALLEGRO_COLOR fundo = al_map_rgb(14, 17, 22);
             ALLEGRO_COLOR cor_normal = al_map_rgb(200, 200, 200); // Cinza claro
             ALLEGRO_COLOR cor_selecionado = al_map_rgb(251, 116, 168); // Happy Pink
-            ALLEGRO_COLOR mouse = al_map_rgb(255, 0, 127); // Bright Pink
+            // ALLEGRO_COLOR mouse = al_map_rgb(255, 0, 127); // Bright Pink
             
             // Reseta para a cor de fundo
             al_clear_to_color(fundo);
 
-            
             // Desenha a imagem de fundo
             int background_width = al_get_bitmap_width(background);
             int background_heitgh = al_get_bitmap_height(background);
-            al_draw_scaled_bitmap(background, 0, 0, background_width, background_heitgh, 0, 0, largura, altura, ALLEGRO_MAG_LINEAR);
+            al_draw_scaled_bitmap(background, 0, 0, background_width, background_heitgh, 0, 0, mundo->largura, mundo->altura, ALLEGRO_MAG_LINEAR);
             
             // Desenha bloco do menu
             int menu_square_width = al_get_bitmap_width(menu_square);
             int menu_square_height = al_get_bitmap_height(menu_square);
-            al_draw_scaled_bitmap(menu_square, 0, 0, menu_square_width, menu_square_height, menu_x - largura/3, menu_y - altura/3, 2 * largura/3, 2* altura/3, ALLEGRO_MIN_LINEAR);
+            al_draw_scaled_bitmap(menu_square, 0, 0, menu_square_width, menu_square_height, menu_x - mundo->largura / 3,
+                             menu_y - mundo->altura / 3, 2 * mundo->largura / 3, 2* mundo->altura / 3, ALLEGRO_MIN_LINEAR);
 
             // Título
             al_draw_text(font, cor_normal, menu_x, title_y, ALLEGRO_ALIGN_CENTER, "MENU");
@@ -170,10 +169,10 @@ int menu(ALLEGRO_DISPLAY *display, ALLEGRO_EVENT_QUEUE *fila_eventos, ALLEGRO_TI
             al_draw_text(font, (selected_option == 2) ? cor_selecionado : cor_normal, menu_x, exit_y, ALLEGRO_ALIGN_CENTER, "EXIT");
 
             // Desenhar mouse falso
-            // Desenha bloco do menu
             int mouse_width = al_get_bitmap_width(mouse_cursor);
             int mouse_height = al_get_bitmap_height(mouse_cursor);
-            al_draw_scaled_bitmap(mouse_cursor, 0, 0, mouse_width, mouse_height, mouse_x, mouse_y, mouse_width * 0.08, mouse_height * 0.08, ALLEGRO_MIN_LINEAR);     
+            al_draw_scaled_bitmap(mouse_cursor, 0, 0, mouse_width, mouse_height, mouse_x, mouse_y, 
+                                    mouse_width * 0.08, mouse_height * 0.08, ALLEGRO_MIN_LINEAR);     
             
             // Copies or updates the front and back buffers so that what has been drawn 
             // previously on the currently selected display becomes visible on screen. 
@@ -190,13 +189,13 @@ int menu(ALLEGRO_DISPLAY *display, ALLEGRO_EVENT_QUEUE *fila_eventos, ALLEGRO_TI
     return selected_option;
 }
 
-int fase_zero(ALLEGRO_DISPLAY *display, ALLEGRO_EVENT_QUEUE *fila_eventos, ALLEGRO_TIMER *timer, int altura, int largura) {
-    if (!display || !fila_eventos || !timer) {
-        matarProgramaErro(3);
-    }
+// int fase_zero(ALLEGRO_DISPLAY *display, ALLEGRO_EVENT_QUEUE *fila_eventos, ALLEGRO_TIMER *timer, int altura, int largura) {
+//     if (!display || !fila_eventos || !timer) {
+//         matarProgramaErro(3);
+//     }
 
-    // Carregar imagem de fundo
-    // Carregar sprite
-    // Carregar obstáculos
-    // Definir game over
-}
+//     // Carregar imagem de fundo
+//     // Carregar sprite
+//     // Carregar obstáculos
+//     // Definir game over
+// }

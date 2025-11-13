@@ -29,10 +29,10 @@ $(TARGET): $(OBJS)
 %.o: %.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
-main.o: telas.h erros.h inicio.h
-telas.o: telas.h
-erros.o: erros.h	
-inicio.o: inicio.h
+main.o: main.c telas.h erros.h inicio.h
+telas.o: telas.h telas.c
+erros.o: erros.h erros.c
+inicio.o: inicio.h inicio.c
 
 clean:
 	rm -f *.o $(TARGET)

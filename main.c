@@ -31,9 +31,11 @@ int main() {
         int selected_option = menu(mundo);
         if (selected_option == 1) {
             // Iniciar Fase 0
+            printf("Entrar na Fase 0\n");
             game_done = true;
         } else if (selected_option == 2) {
             // Terminar jogo e fechar tela
+            printf("Sair do jogo.\n");
             game_done = true;
         } else {
             continue;

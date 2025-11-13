@@ -1,12 +1,15 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 #include <allegro5/allegro.h>
 #include <allegro5/allegro_image.h> // Add-on de Imagem
 #include <allegro5/allegro_font.h>   // Add-on de Fonte
 #include <allegro5/allegro_ttf.h>
+#include <allegro5/allegro_primitives.h>
 
 #include "erros.h"
 #include "inicio.h"
+#include "hitbox.h"
 
 int menu(struct mundo *mundo) {
     if (!mundo) {
@@ -189,13 +192,100 @@ int menu(struct mundo *mundo) {
     return selected_option;
 }
 
-// int fase_zero(ALLEGRO_DISPLAY *display, ALLEGRO_EVENT_QUEUE *fila_eventos, ALLEGRO_TIMER *timer, int altura, int largura) {
-//     if (!display || !fila_eventos || !timer) {
-//         matarProgramaErro(3);
-//     }
+int fase_zero(struct mundo *mundo) {
+    if (!mundo) {
+        matarProgramaErro(3);
+    }
 
-//     // Carregar imagem de fundo
-//     // Carregar sprite
-//     // Carregar obstáculos
-//     // Definir game over
-// }
+    ALLEGRO_BITMAP *background = al_load_bitmap("assets/images/backgrounf-fase0-placeholder.png");
+    if (!background) {
+        return 1;
+    }
+
+    bool game_done = false;
+    bool redraw = true;
+
+    struct hitbox *player = cria_hitbox(100, 100, 10, 10, 5, NULL);
+    float velocidade = 10;
+
+    // Posição inicial do background
+    float back_x = 0;
+
+    while (!game_done) {
+        ALLEGRO_EVENT evento;
+        al_wait_for_event(mundo->fila_eventos, &evento);
+        
+        switch (evento.type) {
+            case ALLEGRO_EVENT_TIMER:
+                redraw = true;
+                ALLEGRO_KEYBOARD_STATE key;
+                al_get_keyboard_state(&key);
+                movimenta_hitbox(&player, key);
+                movimenta_background(&back_x, velocidade, key);                
+                
+                if (player->x < 0) {
+                    player->x = 0;
+                }
+    
+                if (player->x + player->width > 640/2) {
+                    player->x = 640/2 - 10;
+                }
+            
+                if (player->y < 0) {
+                    player->y = 0;
+                }
+    
+                if (player->y > 320) {
+                    player->y = 320/2 - player->height; 
+                }
+                break;
+            case ALLEGRO_EVENT_DISPLAY_CLOSE:
+                game_done = true;
+                break;
+            default:
+                break;
+        }
+        
+        
+        if (redraw && al_event_queue_is_empty(mundo->fila_eventos)) {
+            
+            
+            al_clear_to_color(al_map_rgb(0, 0, 0));
+            al_draw_rectangle(0, 0, 640, 320, al_map_rgb(255, 0, 0), 2);
+
+            // Jogador temporário
+            
+            // Definir cores
+            ALLEGRO_COLOR fundo = al_map_rgb(14, 17, 22);
+            // ALLEGRO_COLOR cor_normal = al_map_rgb(200, 200, 200); // Cinza claro
+            // ALLEGRO_COLOR cor_selecionado = al_map_rgb(251, 116, 168); // Happy Pink
+            // ALLEGRO_COLOR mouse = al_map_rgb(255, 0, 127); // Bright Pink
+            ALLEGRO_COLOR ceu = al_map_rgb(135, 206, 235);
+            
+            // Reseta para a cor de fundo
+            al_clear_to_color(fundo);
+            
+            int bg_w = al_get_bitmap_width(background);
+            int bg_h = al_get_bitmap_height(background);
+            
+            al_clear_to_color(ceu);
+            
+            float offset_x = fmod(back_x, bg_w);
+            
+            // Desenha a imagem de fundo
+            al_draw_scaled_bitmap(background, 0, 0, bg_w, bg_h, -offset_x, 0, bg_w, 320, 0);
+                
+            al_draw_scaled_bitmap(background, 0, 0, bg_w, bg_h, -offset_x + bg_w, 0, bg_w, 320, 0);
+            
+            al_draw_scaled_bitmap(background, 0, 0, bg_w, bg_h, offset_x - bg_w, 0, bg_w, 320, 0);
+
+            // Meu player (temp)
+            al_draw_filled_rectangle(player->x, player->y, player->x + 10, player->y + 10, al_map_rgb(255, 0, 0));
+            
+            al_flip_display();
+            redraw = false;
+        }
+        
+    }
+    return 0; // TEMP
+}

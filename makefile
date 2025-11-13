@@ -1,14 +1,14 @@
 CC = gcc
 # Define uma variável para os pacotes, facilitando a leitura
-PKGS = allegro-5 allegro_main-5 allegro_image-5 allegro_font-5 allegro_primitives-5 allegro_ttf-5
+PKGS = allegro-5 allegro_main-5 allegro_image-5 allegro_font-5 allegro_primitives-5 allegro_ttf-5 allegro_primitives-5
 # Flags de COMPILAÇÂO
 CFLAGS = $(shell pkg-config --cflags $(PKGS)) -Wall -Wextra
 #Flags de LINKAGEM
-LDLIBS = $(shell pkg-config --libs $(PKGS))
+LDLIBS = $(shell pkg-config --libs $(PKGS)) -lm
 
 
 # Lista de arquivos fonte
-SRC = main.c telas.c erros.c inicio.c
+SRC = main.c telas.c erros.c inicio.c hitbox.c
 
 # Lista de arquivos objetos
 OBJS = $(SRC:.c=.o)
@@ -33,6 +33,7 @@ main.o: main.c telas.h erros.h inicio.h
 telas.o: telas.h telas.c
 erros.o: erros.h erros.c
 inicio.o: inicio.h inicio.c
+hitbox.o: hitbox.h hitbox.c
 
 clean:
 	rm -f *.o $(TARGET)

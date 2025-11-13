@@ -12,6 +12,9 @@
     c. Quadrado do menu
     d. Lógica dos botão
 5. Função modular de verificação de colisão
+6. Ver boas práticas de nomeclatura de arquivos e funções
+7. Ver como que funciona gravidade pro boneco pular
+8. Ajeitar sprites
 
 ### Allegro Addons:
 

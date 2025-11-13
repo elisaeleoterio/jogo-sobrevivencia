@@ -1,6 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 #include <allegro5/allegro.h>
+#include <allegro5/allegro_image.h> // Add-on de Imagem
+#include <allegro5/allegro_font.h>   // Add-on de Fonte
+#include <allegro5/allegro_ttf.h>
+#include <allegro5/allegro_primitives.h>
 
 #include "erros.h"
 #include "inicio.h"
@@ -13,7 +18,7 @@ struct mundo *criar_mundo() {
         matarProgramaErro(5);
     }
 
-    mundo->display = criar_display(mundo->largura, mundo->altura);
+    mundo->display = criar_display(&mundo->largura, &mundo->altura);
     if (!mundo->display) {
         matarProgramaErro(4);
     }
@@ -31,9 +36,21 @@ struct mundo *criar_mundo() {
         matarProgramaErro(4);
     }
     
-    
+    return mundo;
 
 }
+
+void destruir_mundo(struct mundo *mundo) {
+    if (!mundo) {
+        matarProgramaErro(3);
+    }
+
+    al_destroy_display(mundo->display);
+    al_destroy_event_queue(mundo->fila_eventos);
+    al_destroy_timer(mundo->timer);
+    
+}
+
 // FUNÇÕES DE INICIALIZAÇÃO DO JOGO E DAS TELAS (ADDONS E VARIÁVEIS)
 
 void inicializar() {
@@ -53,6 +70,11 @@ void inicializar() {
     {
         matarProgramaErro(1);
     }
+
+    if (!al_init_primitives_addon()) {
+        matarProgramaErro(1);
+    }
+    
 
     if (!al_install_mouse()) {
         matarProgramaErro(1);
@@ -95,5 +117,39 @@ ALLEGRO_DISPLAY *criar_display(int *largura, int *altura) {
     }
 
     return display;
+}
 
+void desenha_background(ALLEGRO_BITMAP *background, float back_x) {
+    if (!background) {
+        matarProgramaErro(3);
+    }
+    
+    
+    int bg_w = al_get_bitmap_width(background);
+    int bg_h = al_get_bitmap_height(background);
+            
+            
+    float offset_x = fmod(back_x, bg_w);
+    // float draw_y = 320 - bg_h;
+            
+    // Desenha a imagem de fundo
+    // sx, sy (Pegar a imagem toda)
+    // sw, sh (A imagem toda)
+    // dx, dy (Posição na tela)
+    // dw, dh (LARGURA original, ALTURA da tela)
+    al_draw_scaled_bitmap(background, 0, 0, bg_w, bg_h, -offset_x, 0, bg_w, 320, 0);
+                
+    // Desenha a segunda cópia (a que "dá a volta")
+    // Ela é desenhada exatamente à direita da primeira,
+    // preenchendo o espaço vazio que aparece durante o scroll.
+    al_draw_scaled_bitmap(background, 0, 0, bg_w, bg_h, -offset_x + bg_w, 0, bg_w, 320, 0);
+}
+
+void movimenta_background(float *back_x, float velocidade, ALLEGRO_KEYBOARD_STATE key) {
+    if (al_key_down(&key, ALLEGRO_KEY_RIGHT)) {
+        *back_x += velocidade;   
+    }
+    if (al_key_down(&key, ALLEGRO_KEY_LEFT)) {
+        *back_x -= velocidade;   
+    }
 }

@@ -5,7 +5,7 @@
 #include "erros.h"
 #include "hitbox.h"
 
-struct hitbox *cria_hitbox(float x, float y, float w, float h, float speed, const char *filename) {
+struct hitbox *cria_hitbox(float x, float y, float w, float h, float speed_x, float speed_y, float forca_pulo, const char *filename) {
     struct hitbox *hit = malloc(sizeof(struct hitbox));
     if (!hit) {
         matarProgramaErro(5);
@@ -17,7 +17,13 @@ struct hitbox *cria_hitbox(float x, float y, float w, float h, float speed, cons
     hit->width = w;
     hit->height = h;
 
-    hit->speed = speed;
+    hit->speed_x = speed_x;
+    hit->speed_y = speed_y;
+
+    hit->forca_pulo = forca_pulo;
+
+    hit->chao = true;
+    hit->steps = 0;
 
     if (filename) {
         hit->sprite = al_load_bitmap(filename);
@@ -61,19 +67,23 @@ int verifica_colisao(struct hitbox *a, struct hitbox *b) {
     return 1;    
 }
 
-// Altera as propriedade da hitbox para que se movimente com teclados
-void movimenta_hitbox(struct hitbox **a, ALLEGRO_KEYBOARD_STATE key) {
+// Altera as propriedade da hitbox para que se movimente com teclados com gravidade
+void movimenta_hitbox(struct hitbox *a, ALLEGRO_KEYBOARD_STATE key) {
     if (al_key_down(&key, ALLEGRO_KEY_RIGHT)) {
-        (*a)->x += (*a)->speed;   
+        a->x += a->speed_x;
+        a->steps++;   
     }
     if (al_key_down(&key, ALLEGRO_KEY_LEFT)) {
-        (*a)->x -= (*a)->speed;  
+        a->x -= a->speed_x;
+        a->steps--;  
     }
     if (al_key_down(&key, ALLEGRO_KEY_DOWN)) {
-        (*a)->y += (*a)->speed; 
+        // Mudar a imagem do sprite para abaixar
+        // Mudar temporariamente a altura do hitbox
     }
-    if (al_key_down(&key, ALLEGRO_KEY_UP)) {
-        (*a)->y -= (*a)->speed; 
+    if (al_key_down(&key, ALLEGRO_KEY_UP) && a->chao) {
+        a->speed_y += a->forca_pulo;
+        a->chao = false; 
     }
 }
 

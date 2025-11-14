@@ -11,6 +11,8 @@
 #include "inicio.h"
 #include "hitbox.h"
 
+#define DISTANCIA_MAX 3000
+
 int menu(struct mundo *mundo) {
     if (!mundo) {
         matarProgramaErro(3);
@@ -205,7 +207,7 @@ int fase_zero(struct mundo *mundo) {
     bool game_done = false;
     bool redraw = true;
 
-    struct hitbox *player = cria_hitbox(100, 100, 10, 10, 5, NULL);
+    struct hitbox *player = cria_hitbox(100, 100, 10, 10, 5, 0, -10, NULL);
     float velocidade = 10;
 
     // Posição inicial do background
@@ -220,24 +222,41 @@ int fase_zero(struct mundo *mundo) {
                 redraw = true;
                 ALLEGRO_KEYBOARD_STATE key;
                 al_get_keyboard_state(&key);
-                movimenta_hitbox(&player, key);
+                movimenta_hitbox(player, key);
+
+                // Implementação da simulação da gravidade
+                player->speed_y += mundo->gravidade;
+                player->y += player->speed_y;
+
+                player->chao = false;
+                if (player->y + player->height > mundo->altura ) {
+                    player->y = mundo->altura - player->height;
+                    player->speed_y = 0;
+                    player->chao = true;
+                }
+                
                 movimenta_background(&back_x, velocidade, key);                
                 
                 if (player->x < 0) {
                     player->x = 0;
                 }
     
-                if (player->x + player->width > 640/2) {
-                    player->x = 640/2 - 10;
+                if (player->x + player->width > mundo->largura/2) {
+                    player->x = mundo->largura/2 - 10;
                 }
             
                 if (player->y < 0) {
                     player->y = 0;
                 }
     
-                if (player->y > 320) {
-                    player->y = 320/2 - player->height; 
+                if (player->y > mundo->altura) {
+                    player->y = mundo->altura - player->height; 
                 }
+                if (player->steps >= DISTANCIA_MAX) {
+                    game_done = true;
+                }
+                
+                printf("%f\n", player->steps);
                 break;
             case ALLEGRO_EVENT_DISPLAY_CLOSE:
                 game_done = true;
@@ -251,7 +270,6 @@ int fase_zero(struct mundo *mundo) {
             
             
             al_clear_to_color(al_map_rgb(0, 0, 0));
-            al_draw_rectangle(0, 0, 640, 320, al_map_rgb(255, 0, 0), 2);
 
             // Jogador temporário
             
@@ -273,11 +291,11 @@ int fase_zero(struct mundo *mundo) {
             float offset_x = fmod(back_x, bg_w);
             
             // Desenha a imagem de fundo
-            al_draw_scaled_bitmap(background, 0, 0, bg_w, bg_h, -offset_x, 0, bg_w, 320, 0);
+            al_draw_scaled_bitmap(background, 0, 0, bg_w, bg_h, -offset_x, 0, bg_w, mundo->altura, 0);
                 
-            al_draw_scaled_bitmap(background, 0, 0, bg_w, bg_h, -offset_x + bg_w, 0, bg_w, 320, 0);
+            al_draw_scaled_bitmap(background, 0, 0, bg_w, bg_h, -offset_x + bg_w, 0, bg_w, mundo->altura, 0);
             
-            al_draw_scaled_bitmap(background, 0, 0, bg_w, bg_h, offset_x - bg_w, 0, bg_w, 320, 0);
+            // al_draw_scaled_bitmap(background, 0, 0, bg_w, bg_h, offset_x - bg_w, 0, bg_w, 320, 0);
 
             // Meu player (temp)
             al_draw_filled_rectangle(player->x, player->y, player->x + 10, player->y + 10, al_map_rgb(255, 0, 0));

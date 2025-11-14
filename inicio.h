@@ -9,12 +9,13 @@ struct mundo {
     int altura, largura; // Tamanho do monitor
     ALLEGRO_TIMER *timer;
     ALLEGRO_EVENT_QUEUE *fila_eventos;
+    float gravidade;
 };
 
 struct mundo *criar_mundo();
 void destruir_mundo(struct mundo *mundo);
 void inicializar();
 ALLEGRO_DISPLAY *criar_display(int *largura, int *altura);
-void movimenta_background(float back_x, float velocidade, ALLEGRO_KEYBOARD_STATE key);
+void movimenta_background(float *back_x, float velocidade, ALLEGRO_KEYBOARD_STATE key);
 
 #endif

@@ -15,6 +15,7 @@
 6. Ver boas práticas de nomeclatura de arquivos e funções
 7. Ver como que funciona gravidade pro boneco pular
 8. Ajeitar sprites
+9. Ver como carregar obstáculos
 
 ### Allegro Addons:
 

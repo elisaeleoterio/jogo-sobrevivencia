@@ -10,6 +10,8 @@
 #include "erros.h"
 #include "inicio.h"
 
+#define GRAVIDADE 0.5
+
 
 // Attibuir variáveis ao mundo
 struct mundo *criar_mundo() {
@@ -35,6 +37,8 @@ struct mundo *criar_mundo() {
         al_destroy_timer(mundo->timer);
         matarProgramaErro(4);
     }
+
+    mundo->gravidade = GRAVIDADE;
     
     return mundo;
 

@@ -4,6 +4,7 @@
 
 #include "erros.h"
 #include "hitbox.h"
+#include "inicio.h"
 
 struct hitbox *cria_hitbox(float x, float y, float w, float h, float speed_x, float speed_y, float forca_pulo, const char *filename) {
     struct hitbox *hit = malloc(sizeof(struct hitbox));
@@ -50,16 +51,16 @@ int verifica_colisao(struct hitbox *a, struct hitbox *b) {
     }
 
     // a está totalmente abaixo de b
-    if (a->y + a->height < b->y) {
+    if (a->y - a->height < b->y) {
         return 0;
     }
 
     // a está totalmente a direita de b
-    if (a->x < b->x + b->width) {
+    if (a->x + a->width < b->x + b->width) {
         return 0;
     }
     // a está totalmente acima de b
-    if (a->y < b->y + b->height) {
+    if (a->y + a->height < b->y - b->height) {
         return 0;
     }
     

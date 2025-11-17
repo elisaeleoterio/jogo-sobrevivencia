@@ -195,13 +195,16 @@ int fase_zero(struct mundo *mundo) {
     bool game_done = false;
     bool redraw = true;
 
-    struct hitbox *player = cria_hitbox(100, 100, 10, 10, 5, 0, -10, NULL);
+    struct hitbox *player = cria_hitbox(100, 100, 10, 15, 2, 0, -10, NULL);
     float velocidade = 10;
+
+    // Criar obstáculo (se move junto com o fundo)
+    struct hitbox *obstacle = cria_hitbox(mundo->largura - 400, mundo->chao_y - 100, 50, 100, -velocidade, 0, 0, NULL);
 
     // Posição inicial do background
     float back_x = 0;
     // Chão do jogo
-    float chao_y = mundo->altura - 150;
+    float chao_y = mundo->altura - 200;
 
     while (!game_done) {
         ALLEGRO_EVENT evento;
@@ -212,8 +215,16 @@ int fase_zero(struct mundo *mundo) {
                 redraw = true;
                 ALLEGRO_KEYBOARD_STATE key;
                 al_get_keyboard_state(&key);
-                movimenta_hitbox(player, key);
+                if (!verifica_colisao(player, obstacle)) {
+                    movimenta_hitbox(player, key);
+                } else {
+                    // Não movimentar para a direita
+                    player->x = 0;
+                }
 
+                // Movimenta o obstáculo junto com o fundo
+                movimenta_hitbox(obstacle, key);
+                
                 // Implementação da simulação da gravidade
                 player->speed_y += mundo->gravidade;
                 player->y += player->speed_y;
@@ -225,12 +236,11 @@ int fase_zero(struct mundo *mundo) {
                     player->chao = true;
                 }
                 
-                movimenta_background(&back_x, velocidade, key);                
                 
                 if (player->x < 0) {
                     player->x = 0;
                 }
-    
+                
                 if (player->x + player->width > mundo->largura/2) {
                     player->x = mundo->largura/2 - 10;
                 }
@@ -238,7 +248,7 @@ int fase_zero(struct mundo *mundo) {
                 if (player->y < 0) {
                     player->y = 0;
                 }
-    
+                
                 if (player->y > mundo->altura) {
                     player->y = mundo->altura - player->height; 
                 }
@@ -246,7 +256,7 @@ int fase_zero(struct mundo *mundo) {
                     game_done = true;
                 }
                 
-                printf("%f\n", player->steps);
+                movimenta_background(&back_x, velocidade, key);                
                 break;
             case ALLEGRO_EVENT_DISPLAY_CLOSE:
                 game_done = true;
@@ -258,20 +268,14 @@ int fase_zero(struct mundo *mundo) {
         
         if (redraw && al_event_queue_is_empty(mundo->fila_eventos)) {
             
-            
             al_clear_to_color(al_map_rgb(0, 0, 0));
-
-            // Jogador temporário
             
             // Definir cores
-            ALLEGRO_COLOR fundo = al_map_rgb(14, 17, 22);
+            // ALLEGRO_COLOR fundo = al_map_rgb(14, 17, 22);
             // ALLEGRO_COLOR cor_normal = al_map_rgb(200, 200, 200); // Cinza claro
             // ALLEGRO_COLOR cor_selecionado = al_map_rgb(251, 116, 168); // Happy Pink
             // ALLEGRO_COLOR mouse = al_map_rgb(255, 0, 127); // Bright Pink
             ALLEGRO_COLOR ceu = al_map_rgb(135, 206, 235);
-            
-            // Reseta para a cor de fundo
-            al_clear_to_color(fundo);
             
             int bg_w = al_get_bitmap_width(background);
             int bg_h = al_get_bitmap_height(background);
@@ -282,16 +286,17 @@ int fase_zero(struct mundo *mundo) {
             
             // Desenha a imagem de fundo
             al_draw_scaled_bitmap(background, 0, 0, bg_w, bg_h, -offset_x, 0, bg_w, mundo->altura, 0);
-                
             al_draw_scaled_bitmap(background, 0, 0, bg_w, bg_h, -offset_x + bg_w, 0, bg_w, mundo->altura, 0);
+            // TODO: Ver como colocar o fundo para o lado esquerdo
             
-            // al_draw_scaled_bitmap(background, 0, 0, bg_w, bg_h, offset_x - bg_w, 0, bg_w, 320, 0);
-
             // Meu player (temp)
-            al_draw_filled_rectangle(player->x, player->y, player->x + 10, player->y + 10, al_map_rgb(255, 0, 0));
-            // NOVO: Desenha um retângulo para o chão
+            al_draw_filled_rectangle(player->x, player->y, player->x + player->width, player->y + player->height, al_map_rgb(255, 0, 0));
+            
             // Começa em (0, chao_y) e vai até (largura da tela, altura da tela)
-            al_draw_filled_rectangle(0, chao_y, mundo->largura, mundo->altura, al_map_rgb(0, 150, 0)); // Um chão verde
+            al_draw_filled_rectangle(0, chao_y, mundo->largura, mundo->altura, al_map_rgb(0, 150, 0)); 
+
+            // Desenha obstáculo de teste
+            al_draw_filled_rectangle(obstacle->x, obstacle->y, obstacle->x + obstacle->width, obstacle->y + obstacle->height, al_map_rgb(0, 255, 0));
             
             al_flip_display();
             redraw = false;

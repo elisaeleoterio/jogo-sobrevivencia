@@ -16,6 +16,7 @@
 7. Ver como que funciona gravidade pro boneco pular
 8. Ajeitar sprites
 9. Ver como carregar obstáculos
+    - Tem que aparecer ao poucos, quando o jogador estiver no passo x
 
 ### Allegro Addons:
 
@@ -34,3 +35,6 @@ allegro_memfile -> allegro
 allegro_physfs -> allegro
 
 allegro_native_dialog -> allegro
+
+### ERROS
+- Não está verificando corretamente a colisão com um obstáculo

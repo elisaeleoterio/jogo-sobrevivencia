@@ -39,6 +39,7 @@ struct mundo *criar_mundo() {
     }
 
     mundo->gravidade = GRAVIDADE;
+    mundo->chao_y = mundo->altura - 200;
     
     return mundo;
 

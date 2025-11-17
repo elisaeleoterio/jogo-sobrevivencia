@@ -19,23 +19,16 @@ int menu(struct mundo *mundo) {
     }
     
     // Carrega imagem de fundo do menu
-    ALLEGRO_BITMAP *background = al_load_bitmap("assets/images/background-placeholder.jpg");
+    ALLEGRO_BITMAP *background = al_load_bitmap("assets/images/menu_background.png");
     if (!background) {
         matarProgramaErro(4);
     }
 
-    // Carrega imagem de destaque do menu
-    ALLEGRO_BITMAP *menu_square = al_load_bitmap("assets/images/menu_placeholder.png");
-    if (!menu_square) {
-        al_destroy_bitmap(background);
-        matarProgramaErro(4);
-    }
 
     // Carrega imagem que irá substituir o cursor do mouse
-    ALLEGRO_BITMAP *mouse_cursor = al_load_bitmap("assets/images/mouse-placeholder.png");
+    ALLEGRO_BITMAP *mouse_cursor = al_load_bitmap("assets/images/mouse_cursor.png");
     if (!mouse_cursor) {
         al_destroy_bitmap(background);
-        al_destroy_bitmap(menu_square);
         matarProgramaErro(4);
     }
 
@@ -43,7 +36,6 @@ int menu(struct mundo *mundo) {
     ALLEGRO_FONT *font = al_load_font("assets/fonts/Gafata-Regular.ttf", 36, 0);
     if (!font) {
         al_destroy_bitmap(background);
-        al_destroy_bitmap(menu_square);
         al_destroy_bitmap(mouse_cursor);
         matarProgramaErro(4);
     }
@@ -161,11 +153,8 @@ int menu(struct mundo *mundo) {
             al_draw_scaled_bitmap(background, 0, 0, background_width, background_heitgh, 0, 0, mundo->largura, mundo->altura, ALLEGRO_MAG_LINEAR);
             
             // Desenha bloco do menu
-            int menu_square_width = al_get_bitmap_width(menu_square);
-            int menu_square_height = al_get_bitmap_height(menu_square);
-            al_draw_scaled_bitmap(menu_square, 0, 0, menu_square_width, menu_square_height, menu_x - mundo->largura / 3,
-                             menu_y - mundo->altura / 3, 2 * mundo->largura / 3, 2* mundo->altura / 3, ALLEGRO_MIN_LINEAR);
-
+            al_draw_filled_rectangle(mundo->largura/3, mundo->altura/3, 2 * mundo->largura / 3, 2* mundo->altura / 3, fundo);
+            
             // Título
             al_draw_text(font, cor_normal, menu_x, title_y, ALLEGRO_ALIGN_CENTER, "MENU");
             // START
@@ -187,7 +176,6 @@ int menu(struct mundo *mundo) {
 
     // Destroi variáveis para finalizar o programa
     al_destroy_bitmap(mouse_cursor);
-    al_destroy_bitmap(menu_square);
     al_destroy_bitmap(background);
     al_destroy_font(font);
 
@@ -212,6 +200,8 @@ int fase_zero(struct mundo *mundo) {
 
     // Posição inicial do background
     float back_x = 0;
+    // Chão do jogo
+    float chao_y = mundo->altura - 150;
 
     while (!game_done) {
         ALLEGRO_EVENT evento;
@@ -229,8 +219,8 @@ int fase_zero(struct mundo *mundo) {
                 player->y += player->speed_y;
 
                 player->chao = false;
-                if (player->y + player->height > mundo->altura ) {
-                    player->y = mundo->altura - player->height;
+                if (player->y + player->height > chao_y ) {
+                    player->y = chao_y - player->height;
                     player->speed_y = 0;
                     player->chao = true;
                 }
@@ -299,6 +289,9 @@ int fase_zero(struct mundo *mundo) {
 
             // Meu player (temp)
             al_draw_filled_rectangle(player->x, player->y, player->x + 10, player->y + 10, al_map_rgb(255, 0, 0));
+            // NOVO: Desenha um retângulo para o chão
+            // Começa em (0, chao_y) e vai até (largura da tela, altura da tela)
+            al_draw_filled_rectangle(0, chao_y, mundo->largura, mundo->altura, al_map_rgb(0, 150, 0)); // Um chão verde
             
             al_flip_display();
             redraw = false;

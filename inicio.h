@@ -10,6 +10,7 @@ struct mundo {
     ALLEGRO_TIMER *timer;
     ALLEGRO_EVENT_QUEUE *fila_eventos;
     float gravidade;
+    float chao_y;
 };
 
 struct mundo *criar_mundo();

@@ -114,7 +114,7 @@ ALLEGRO_DISPLAY *criar_display(int *largura, int *altura) {
     *altura = monitor_info.y2 - monitor_info.y1;
 
     // Setar a flag de FULLSCREEN_WINDOW - faz com que consuma a tela toda, tirando as bordas
-    al_set_new_display_flags(ALLEGRO_FULLSCREEN); // OU ALLLEGRO_FULSCREEN_WINDOW
+    al_set_new_display_flags(ALLEGRO_FULLSCREEN_WINDOW); // OU ALLLEGRO_FULSCREEN_WINDOW
 
     ALLEGRO_DISPLAY *display = al_create_display(*largura, *altura);
     if (!display) {

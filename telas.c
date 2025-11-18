@@ -12,6 +12,7 @@
 #include "hitbox.h"
 
 #define DISTANCIA_MAX 3000
+#define TOLERANCIA 0.2
 
 int menu(struct mundo *mundo) {
     if (!mundo) {
@@ -199,7 +200,16 @@ int fase_zero(struct mundo *mundo) {
     float velocidade = 10;
 
     // Criar obstáculo (se move junto com o fundo)
-    struct hitbox *obstacle = cria_hitbox(mundo->largura - 400, mundo->chao_y - 100, 50, 100, -velocidade, 0, 0, NULL);
+    struct obstacle *lista_obstaculos =  NULL;
+    adicionar_obstaculo(&lista_obstaculos, cria_hitbox(mundo->largura - 400, mundo->chao_y - 50, 100, 50, -velocidade, 0, 0, NULL));
+    adicionar_obstaculo(&lista_obstaculos, cria_hitbox(mundo->largura - 500, mundo->chao_y - 80, 100, 80, -velocidade, 0, 0, NULL));
+
+    struct obstacle *espinhos = NULL;
+    for (size_t i = 0; i < 5; i++) {
+        adicionar_obstaculo(&espinhos, cria_hitbox(mundo->largura - 200))
+    }
+    
+
 
     // Posição inicial do background
     float back_x = 0;
@@ -215,21 +225,30 @@ int fase_zero(struct mundo *mundo) {
                 redraw = true;
                 ALLEGRO_KEYBOARD_STATE key;
                 al_get_keyboard_state(&key);
-                if (!verifica_colisao(player, obstacle)) {
-                    movimenta_hitbox(player, key);
-                } else {
-                    // Não movimentar para a direita
-                    player->x = 0;
-                }
 
-                // Movimenta o obstáculo junto com o fundo
-                movimenta_hitbox(obstacle, key);
+                // Posições iniciais
+                player->old_x = player->x;
+                float old_back_x = back_x;
+
+                
+                // Movimentar no Eixo X:                
+                movimenta_hitbox(player, key);
+                movimenta_lista_obstaculos(lista_obstaculos, key);
+                movimenta_background(&back_x, velocidade, key);
+
+                // Verifica colisão no eixo x -> Antes da atuação da gravidade
+                verifica_colisao_obs_eixo_x(player, lista_obstaculos, &back_x, old_back_x, key);
+                
+                player->chao = false;
                 
                 // Implementação da simulação da gravidade
                 player->speed_y += mundo->gravidade;
                 player->y += player->speed_y;
-
-                player->chao = false;
+                
+                verifica_colisao_obs_eixo_y(player, lista_obstaculos);
+                
+                salva_pos_anterior_lista(lista_obstaculos);
+                // Verifica chão
                 if (player->y + player->height > chao_y ) {
                     player->y = chao_y - player->height;
                     player->speed_y = 0;
@@ -237,26 +256,16 @@ int fase_zero(struct mundo *mundo) {
                 }
                 
                 
-                if (player->x < 0) {
-                    player->x = 0;
-                }
+                // Limites de movimentação da tela
+                if (player->x < 0) player->x = 0;
+                if (player->x + player->width > mundo->largura/2) player->x = mundo->largura/2 - 10;
+                if (player->y < 0) player->y = 0;
+                if (player->y > mundo->altura) player->y = mundo->altura - player->height; 
                 
-                if (player->x + player->width > mundo->largura/2) {
-                    player->x = mundo->largura/2 - 10;
-                }
-            
-                if (player->y < 0) {
-                    player->y = 0;
-                }
-                
-                if (player->y > mundo->altura) {
-                    player->y = mundo->altura - player->height; 
-                }
                 if (player->steps >= DISTANCIA_MAX) {
                     game_done = true;
                 }
                 
-                movimenta_background(&back_x, velocidade, key);                
                 break;
             case ALLEGRO_EVENT_DISPLAY_CLOSE:
                 game_done = true;
@@ -296,7 +305,9 @@ int fase_zero(struct mundo *mundo) {
             al_draw_filled_rectangle(0, chao_y, mundo->largura, mundo->altura, al_map_rgb(0, 150, 0)); 
 
             // Desenha obstáculo de teste
-            al_draw_filled_rectangle(obstacle->x, obstacle->y, obstacle->x + obstacle->width, obstacle->y + obstacle->height, al_map_rgb(0, 255, 0));
+            al_draw_filled_rectangle(lista_obstaculos->hitbox->x, lista_obstaculos->hitbox->y, lista_obstaculos->hitbox->x + lista_obstaculos->hitbox->width, lista_obstaculos->hitbox->y + lista_obstaculos->hitbox->height, al_map_rgb(0, 0, 255));
+            al_draw_filled_rectangle(lista_obstaculos->next->hitbox->x, lista_obstaculos->next->hitbox->y, lista_obstaculos->next->hitbox->x + lista_obstaculos->next->hitbox->width, lista_obstaculos->next->hitbox->y + lista_obstaculos->next->hitbox->height, al_map_rgb(0, 0, 255));
+
             
             al_flip_display();
             redraw = false;

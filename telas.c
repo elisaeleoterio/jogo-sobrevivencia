@@ -14,6 +14,16 @@
 #define DISTANCIA_MAX 3000
 #define TOLERANCIA 0.2
 
+#define PLATAFORMA 1
+#define ESPINHO 2
+#define ANIMAL 3
+#define BURACO_FIXO 4
+#define BURACO_SURGE 5
+#define PLATAFORMA_MOVEL 6
+#define CAVERNA 7
+#define PERSONAGEM 8
+
+
 int menu(struct mundo *mundo) {
     if (!mundo) {
         matarProgramaErro(3);
@@ -196,20 +206,32 @@ int fase_zero(struct mundo *mundo) {
     bool game_done = false;
     bool redraw = true;
 
-    struct hitbox *player = cria_hitbox(100, 100, 10, 15, 2, 0, -10, NULL);
+    struct hitbox *player = cria_hitbox(100, 100, 10, 15, 2, 0, -10, NULL, PERSONAGEM);
     float velocidade = 10;
 
-    // Criar obstáculo (se move junto com o fundo)
-    struct obstacle *lista_obstaculos =  NULL;
-    adicionar_obstaculo(&lista_obstaculos, cria_hitbox(mundo->largura - 400, mundo->chao_y - 50, 100, 50, -velocidade, 0, 0, NULL));
-    adicionar_obstaculo(&lista_obstaculos, cria_hitbox(mundo->largura - 500, mundo->chao_y - 80, 100, 80, -velocidade, 0, 0, NULL));
+    // Plataformas de subir
+    struct obstacle *lista_plataforma = NULL;
+    adicionar_obstaculo(&lista_plataforma, cria_hitbox(mundo->largura - 400, mundo->chao_y - 50, 100, 50, -velocidade, 0, 0, NULL, PLATAFORMA));
+    adicionar_obstaculo(&lista_plataforma, cria_hitbox(mundo->largura - 300, mundo->chao_y - 100, 90, 100, -velocidade, 0, 0, NULL, PLATAFORMA));
+    adicionar_obstaculo(&lista_plataforma, cria_hitbox(mundo->largura - 200, mundo->chao_y - 150, 80, 150, -velocidade, 0, 0, NULL, PLATAFORMA));
+    adicionar_obstaculo(&lista_plataforma, cria_hitbox(mundo->largura - 100, mundo->chao_y - 200, 70, 200, -velocidade, 0, 0, NULL, PLATAFORMA));
 
-    struct obstacle *espinhos = NULL;
-    for (size_t i = 0; i < 5; i++) {
-        adicionar_obstaculo(&espinhos, cria_hitbox(mundo->largura - 200))
-    }
-    
 
+    // // Obstáculo de espinhos
+    // struct hitbox *espinho = cria_hitbox(mundo->largura + 200, mundo->chao_y - 100, 100, 50, -velocidade, 0, 0, NULL, ESPINHO);
+
+    // // Obstáculo de animal que se move (VER COMO QUE FAZ PARA SE MOVER LATERALMENTE COM MAIOR CONSTÂNCIA)
+    // struct hitbox *animal = cria_hitbox(mundo->largura - 400, mundo->chao_y - 50, 100, 50, -velocidade, 0, 0, NULL, PLATAFORMA);
+
+    // // Buraco no chão fixo
+    // struct hitbox *buraco_fixo = cria_hitbox(mundo->largura - 400, mundo->chao_y - 50, 100, 50, -velocidade, 0, 0, NULL, PLATAFORMA);
+
+    // // Plataformas móveis
+    // struct hitbox *plataforma1 = cria_hitbox(mundo->largura - 400, mundo->chao_y - 50, 100, 50, -velocidade, 0, 0, NULL, PLATAFORMA);
+    // struct hitbox *plataforma1 = cria_hitbox(mundo->largura - 400, mundo->chao_y - 50, 100, 50, -velocidade, 0, 0, NULL, PLATAFORMA);
+
+    // // Buraco longo -> Usar habilidade de voar
+    // struct hitbox *plataforma1 = cria_hitbox(mundo->largura - 400, mundo->chao_y - 50, 100, 50, -velocidade, 0, 0, NULL, PLATAFORMA);
 
     // Posição inicial do background
     float back_x = 0;
@@ -233,21 +255,20 @@ int fase_zero(struct mundo *mundo) {
                 
                 // Movimentar no Eixo X:                
                 movimenta_hitbox(player, key);
-                movimenta_lista_obstaculos(lista_obstaculos, key);
+                movimenta_lista_obstaculos(lista_plataforma, key);
                 movimenta_background(&back_x, velocidade, key);
 
                 // Verifica colisão no eixo x -> Antes da atuação da gravidade
-                verifica_colisao_obs_eixo_x(player, lista_obstaculos, &back_x, old_back_x, key);
+                verifica_colisao_obs_eixo_x(player, lista_plataforma, &back_x, old_back_x, key);
                 
                 player->chao = false;
-                
+                    
                 // Implementação da simulação da gravidade
                 player->speed_y += mundo->gravidade;
                 player->y += player->speed_y;
-                
-                verifica_colisao_obs_eixo_y(player, lista_obstaculos);
-                
-                salva_pos_anterior_lista(lista_obstaculos);
+                    
+                verifica_colisao_obs_eixo_y(player, lista_plataforma);
+    
                 // Verifica chão
                 if (player->y + player->height > chao_y ) {
                     player->y = chao_y - player->height;
@@ -255,14 +276,13 @@ int fase_zero(struct mundo *mundo) {
                     player->chao = true;
                 }
                 
-                
                 // Limites de movimentação da tela
                 if (player->x < 0) player->x = 0;
                 if (player->x + player->width > mundo->largura/2) player->x = mundo->largura/2 - 10;
                 if (player->y < 0) player->y = 0;
                 if (player->y > mundo->altura) player->y = mundo->altura - player->height; 
                 
-                if (player->steps >= DISTANCIA_MAX) {
+                if (player->steps >= DISTANCIA_MAX || player->life <= 0) {
                     game_done = true;
                 }
                 
@@ -304,9 +324,12 @@ int fase_zero(struct mundo *mundo) {
             // Começa em (0, chao_y) e vai até (largura da tela, altura da tela)
             al_draw_filled_rectangle(0, chao_y, mundo->largura, mundo->altura, al_map_rgb(0, 150, 0)); 
 
-            // Desenha obstáculo de teste
-            al_draw_filled_rectangle(lista_obstaculos->hitbox->x, lista_obstaculos->hitbox->y, lista_obstaculos->hitbox->x + lista_obstaculos->hitbox->width, lista_obstaculos->hitbox->y + lista_obstaculos->hitbox->height, al_map_rgb(0, 0, 255));
-            al_draw_filled_rectangle(lista_obstaculos->next->hitbox->x, lista_obstaculos->next->hitbox->y, lista_obstaculos->next->hitbox->x + lista_obstaculos->next->hitbox->width, lista_obstaculos->next->hitbox->y + lista_obstaculos->next->hitbox->height, al_map_rgb(0, 0, 255));
+            // Desenha obstáculos de teste
+            struct obstacle *atual = lista_plataforma;
+            while (atual != NULL) {
+                al_draw_filled_rectangle(atual->hitbox->x, atual->hitbox->y, atual->hitbox->x + atual->hitbox->width, atual->hitbox->y + atual->hitbox->height, al_map_rgb(0, 0, 255));
+                atual = atual->next;              
+            }
 
             
             al_flip_display();

@@ -8,7 +8,7 @@
 
 #define TOLERANCIA 0.2
 
-struct hitbox *cria_hitbox(float x, float y, float w, float h, float speed_x, float speed_y, float forca_pulo, const char *filename) {
+struct hitbox *cria_hitbox(float x, float y, float w, float h, float speed_x, float speed_y, float forca_pulo, const char *filename, int tipo) {
     struct hitbox *hit = malloc(sizeof(struct hitbox));
     if (!hit) {
         matarProgramaErro(5);
@@ -28,6 +28,9 @@ struct hitbox *cria_hitbox(float x, float y, float w, float h, float speed_x, fl
     hit->chao = true;
     hit->steps = 0;
 
+    hit->life = 5;
+    hit->tipo = tipo;
+    
     if (filename) {
         hit->sprite = al_load_bitmap(filename);
         if (!hit->sprite) {

@@ -209,7 +209,7 @@ void verifica_colisao_obs_eixo_x(struct hitbox *player, struct obstacle *lista_o
                                         
                     // Ajusta player (se o mundo reverteu, obstacle->x volta a ser prev_x)
                     player->x = obstacle->x - player->width - 0.1;
-                } 
+                }  
                 // Veio da DIREITA
                 else {
                     if (al_key_down(&key, ALLEGRO_KEY_LEFT) && !world_stopped) {

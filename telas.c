@@ -212,13 +212,17 @@ int fase_zero(struct mundo *mundo) {
     // Plataformas de subir
     struct obstacle *lista_plataforma = NULL;
     adicionar_obstaculo(&lista_plataforma, cria_hitbox(mundo->largura - 400, mundo->chao_y - 50, 100, 50, -velocidade, 0, 0, NULL, PLATAFORMA));
-    adicionar_obstaculo(&lista_plataforma, cria_hitbox(mundo->largura - 300, mundo->chao_y - 100, 90, 100, -velocidade, 0, 0, NULL, PLATAFORMA));
-    adicionar_obstaculo(&lista_plataforma, cria_hitbox(mundo->largura - 200, mundo->chao_y - 150, 80, 150, -velocidade, 0, 0, NULL, PLATAFORMA));
-    adicionar_obstaculo(&lista_plataforma, cria_hitbox(mundo->largura - 100, mundo->chao_y - 200, 70, 200, -velocidade, 0, 0, NULL, PLATAFORMA));
+    adicionar_obstaculo(&lista_plataforma, cria_hitbox(mundo->largura - 200, mundo->chao_y - 100, 100, 100, -velocidade, 0, 0, NULL, PLATAFORMA));
+    adicionar_obstaculo(&lista_plataforma, cria_hitbox(mundo->largura - 0, mundo->chao_y - 150, 100, 150, -velocidade, 0, 0, NULL, PLATAFORMA));
+    adicionar_obstaculo(&lista_plataforma, cria_hitbox(mundo->largura + 200, mundo->chao_y - 200, 100, 200, -velocidade, 0, 0, NULL, PLATAFORMA));
 
 
     // // Obstáculo de espinhos
-    // struct hitbox *espinho = cria_hitbox(mundo->largura + 200, mundo->chao_y - 100, 100, 50, -velocidade, 0, 0, NULL, ESPINHO);
+    struct obstacle *espinho = NULL;
+    adicionar_obstaculo(&espinho, cria_hitbox(mundo->largura - 300, mundo->chao_y - 30, 100, 30, -velocidade, 0, 0, NULL, ESPINHO));
+    adicionar_obstaculo(&espinho, cria_hitbox(mundo->largura - 100  , mundo->chao_y - 40, 100, 40, -velocidade, 0, 0, NULL, ESPINHO));
+    adicionar_obstaculo(&espinho, cria_hitbox(mundo->largura + 100, mundo->chao_y - 50, 100, 50, -velocidade, 0, 0, NULL, ESPINHO));
+    adicionar_obstaculo(&espinho, cria_hitbox(mundo->largura + 300, mundo->chao_y - 60, 100, 60, -velocidade, 0, 0, NULL, ESPINHO));
 
     // // Obstáculo de animal que se move (VER COMO QUE FAZ PARA SE MOVER LATERALMENTE COM MAIOR CONSTÂNCIA)
     // struct hitbox *animal = cria_hitbox(mundo->largura - 400, mundo->chao_y - 50, 100, 50, -velocidade, 0, 0, NULL, PLATAFORMA);
@@ -256,10 +260,12 @@ int fase_zero(struct mundo *mundo) {
                 // Movimentar no Eixo X:                
                 movimenta_hitbox(player, key);
                 movimenta_lista_obstaculos(lista_plataforma, key);
+                movimenta_lista_obstaculos(espinho, key);
                 movimenta_background(&back_x, velocidade, key);
 
                 // Verifica colisão no eixo x -> Antes da atuação da gravidade
                 verifica_colisao_obs_eixo_x(player, lista_plataforma, &back_x, old_back_x, key);
+                verifica_colisao_obs_eixo_x(player, espinho, &back_x, old_back_x, key);
                 
                 player->chao = false;
                     
@@ -268,6 +274,7 @@ int fase_zero(struct mundo *mundo) {
                 player->y += player->speed_y;
                     
                 verifica_colisao_obs_eixo_y(player, lista_plataforma);
+                verifica_colisao_obs_eixo_y(player, espinho);
     
                 // Verifica chão
                 if (player->y + player->height > chao_y ) {
@@ -276,6 +283,9 @@ int fase_zero(struct mundo *mundo) {
                     player->chao = true;
                 }
                 
+                salva_pos_anterior_lista(lista_plataforma);
+                salva_pos_anterior_lista(espinho);
+
                 // Limites de movimentação da tela
                 if (player->x < 0) player->x = 0;
                 if (player->x + player->width > mundo->largura/2) player->x = mundo->largura/2 - 10;
@@ -328,6 +338,12 @@ int fase_zero(struct mundo *mundo) {
             struct obstacle *atual = lista_plataforma;
             while (atual != NULL) {
                 al_draw_filled_rectangle(atual->hitbox->x, atual->hitbox->y, atual->hitbox->x + atual->hitbox->width, atual->hitbox->y + atual->hitbox->height, al_map_rgb(0, 0, 255));
+                atual = atual->next;              
+            }
+
+            atual = espinho;
+            while (atual != NULL) {
+                al_draw_filled_rectangle(atual->hitbox->x, atual->hitbox->y, atual->hitbox->x + atual->hitbox->width, atual->hitbox->y + atual->hitbox->height, al_map_rgb(255, 0, 0));
                 atual = atual->next;              
             }
 

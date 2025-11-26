@@ -75,4 +75,8 @@ void atualiza_lista_plat_movel(struct obstacle *raiz);
 void atualiza_patrulha(struct hitbox *obs);
 void configura_plat_movel(struct hitbox *obs, float distancia_altura, float velocidade_propria);
 
+void atualiza_lista_obs_despenca(struct obstacle *raiz);
+void obs_despenca_atualiza(struct hitbox *obs);
+void obs_despenca_horizontal(struct hitbox *obs, int direcao, float velocidade_propria);
+
 #endif

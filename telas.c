@@ -11,7 +11,7 @@
 #include "inicio.h"
 #include "hitbox.h"
 
-#define DISTANCIA_MAX 3000
+#define DISTANCIA_MAX 2000
 #define TOLERANCIA 0.2
 
 #define PLATAFORMA 1
@@ -34,7 +34,6 @@ int menu(struct mundo *mundo) {
     if (!background) {
         matarProgramaErro(4);
     }
-
 
     // Carrega imagem que irá substituir o cursor do mouse
     ALLEGRO_BITMAP *mouse_cursor = al_load_bitmap("assets/images/mouse_cursor.png");
@@ -59,6 +58,7 @@ int menu(struct mundo *mundo) {
     // Variáveis de estado do mouse e seleção
     int mouse_x = 0;
     int mouse_y = 0;
+
     // 0 = nenhum, 1 = Start, 2 = Exit
     int selected_option = 0; 
 
@@ -73,10 +73,6 @@ int menu(struct mundo *mundo) {
         // Ponto Y central
         float menu_y = mundo->altura / 2.0;
 
-        // // Tamanho do bloco do menu
-        // float menu_width = 2 * mundo->largura / 3; // Largura total do bloco do menu
-        // float menu_height = 2 * mundo->altura /3; // Altura total do bloco do menu
-
         // Espaçamento entre os itens
         float padding = font_height * 1; // Meia linha de espaço
 
@@ -84,8 +80,6 @@ int menu(struct mundo *mundo) {
         float title_y = menu_y - font_height - padding;
         float start_y = menu_y + padding;
         float exit_y = start_y + padding; 
-
-
 
         ALLEGRO_EVENT evento;
         // Espera por um evento (do usuário ou do timer)
@@ -99,38 +93,38 @@ int menu(struct mundo *mundo) {
                 float exit_text_width = al_get_text_width(font, "EXIT");
 
                 // Definir as áreas das hitboxes
-                // START
+                // BOTÃO START
                 float start_x1 = menu_x - (start_text_width / 2.0);
                 float start_x2 = menu_x + (start_text_width / 2.0);
                 float start_y1 = start_y; // Y do topo (usado no al_draw_text)
                 float start_y2 = start_y + font_height; // Y da base
 
-                // EXIT
+                // BOTÃO EXIT
                 float exit_x1 = menu_x - (exit_text_width / 2.0);
                 float exit_x2 = menu_x + (exit_text_width / 2.0);
                 float exit_y1 = exit_y; // Y do topo
                 float exit_y2 = exit_y + font_height; // Y da base
             
-                // Verificação se o mouse está encima de algum botão
+                // Verificação se o mouse está encima de algum botão (muda a cor)
                 if ((mouse_x >= start_x1 && mouse_x <= start_x2) && (mouse_y >= start_y1 && mouse_y <= start_y2)) {
-                    selected_option = 1; 
+                    selected_option = 1;
                 } else if ((mouse_x >= exit_x1 && mouse_x <= exit_x2) && (mouse_y >= exit_y1 && mouse_y <= exit_y2)) {
                     selected_option = 2;
                 } else {
                     selected_option = 0;
                 }
                 redraw = true;
-
                 break;
+
             // Realiza esse evento a cada movimentação do mouse
             case ALLEGRO_EVENT_MOUSE_AXES:
                 // Atualização da posição do mouse
                 mouse_x = evento.mouse.x;
                 mouse_y = evento.mouse.y;
                 break;
+
             // Realiza esse evento se o usuário selecionar alguma opçao do menu
             case ALLEGRO_EVENT_MOUSE_BUTTON_DOWN:
-                // TESTE - NÃO ESPECIFICANDO QUAL BOTÃO FOI PRESSIONADO DO MOUSE
                 if (selected_option == 1) {
                     printf("Botão START pressionado.\n");
                     menu_done = true;
@@ -153,7 +147,7 @@ int menu(struct mundo *mundo) {
             ALLEGRO_COLOR fundo = al_map_rgb(14, 17, 22);
             ALLEGRO_COLOR cor_normal = al_map_rgb(200, 200, 200); // Cinza claro
             ALLEGRO_COLOR cor_selecionado = al_map_rgb(251, 116, 168); // Happy Pink
-            // ALLEGRO_COLOR mouse = al_map_rgb(255, 0, 127); // Bright Pink
+            ALLEGRO_COLOR mouse = al_map_rgb(255, 0, 127); // Bright Pink
             
             // Reseta para a cor de fundo
             al_clear_to_color(fundo);
@@ -217,6 +211,10 @@ int fase_zero(struct mundo *mundo) {
         adicionar_obstaculo(&lista_plataforma, cria_hitbox(mundo->largura - 200, mundo->chao_y - 100, 100, 100, -velocidade, 0, 0, NULL, PLATAFORMA));
         adicionar_obstaculo(&lista_plataforma, cria_hitbox(mundo->largura - 0, mundo->chao_y - 150, 100, 150, -velocidade, 0, 0, NULL, PLATAFORMA));
         adicionar_obstaculo(&lista_plataforma, cria_hitbox(mundo->largura + 200, mundo->chao_y - 200, 100, 200, -velocidade, 0, 0, NULL, PLATAFORMA));
+
+        // Plataforma que caí quando o player encosta
+        struct obstacle *plataforma_cai = NULL;
+        adicionar_obstaculo(&plataforma_cai, cria_hitbox(mundo->largura + 3000, mundo->chao_y - 50, 100, 20, -velocidade, 0, 0, NULL, PLATAFORMA));
     
         // // Obstáculo de espinhos
         struct obstacle *espinho = NULL;
@@ -241,10 +239,15 @@ int fase_zero(struct mundo *mundo) {
         adicionar_obstaculo(&appear_hole, buraco_surge);
 
         // Obstáculo de plataforma que se move verticalmente
-        struct hitbox *plat_m1 = cria_hitbox(mundo->largura + 2500, mundo->chao_y - 200, 100, 200, -velocidade, 0, 0, NULL, PLATAFORMA_MOVEL);
-        configura_plat_movel(plat_m1, 200, 1);
+        struct hitbox *plat_m1 = cria_hitbox(mundo->largura + 2500, 0, 100, 700, -velocidade, 0, 0, NULL, PLATAFORMA_MOVEL);
+        configura_plat_movel(plat_m1, 200, 2);
         struct obstacle *plat_movel = NULL;
         adicionar_obstaculo(&plat_movel, plat_m1);
+
+        struct hitbox *obs_despenca = cria_hitbox(mundo->largura + 4000, mundo->chao_y - 50, 100, 50, -velocidade, 0, 0, NULL, ANIMAL);
+        obs_despenca_horizontal(obs_despenca, -1, 8);
+        struct obstacle *despenca = NULL;
+        adicionar_obstaculo(&despenca, obs_despenca);
     
         // Posição inicial do background
         float back_x = 0;
@@ -287,11 +290,14 @@ int fase_zero(struct mundo *mundo) {
                     movimenta_lista_obstaculos(fixed_hole, key);
                     movimenta_lista_obstaculos(appear_hole, key);
                     movimenta_lista_obstaculos(plat_movel, key);
+                    movimenta_lista_obstaculos(plataforma_cai, key);
+                    movimenta_lista_obstaculos(despenca, key);
                     movimenta_background(&back_x, velocidade, key);
 
                     atualiza_lista_patrulha(animais);
                     atualiza_lista_plat_movel(plat_movel);
                     atualiza_buracos_periodicos(appear_hole);
+                    atualiza_lista_obs_despenca(despenca);
     
                     // Verifica colisão no eixo x -> Antes da atuação da gravidade
                     bool parou_plataforma = verifica_colisao_obs_eixo_x(player, lista_plataforma, &back_x, old_back_x, key);
@@ -300,6 +306,8 @@ int fase_zero(struct mundo *mundo) {
                     bool parou_animal = verifica_colisao_obs_eixo_x(player, animais, &back_x, old_back_x, key);
                     bool parou_buracos = verifica_colisao_obs_eixo_x(player, fixed_hole, &back_x, old_back_x, key);
                     bool parou_buracos_surge = verifica_colisao_obs_eixo_x(player, appear_hole, &back_x, old_back_x, key);
+                    bool parou_plat_cai = verifica_colisao_obs_eixo_x(player, plataforma_cai, &back_x, old_back_x, key);
+                    bool parou_despenca = verifica_colisao_obs_eixo_x(player, despenca, &back_x, old_back_x, key);
     
                     if (parou_plataforma) {
                         reverte_pos_lista(espinho);
@@ -307,6 +315,7 @@ int fase_zero(struct mundo *mundo) {
                         reverte_pos_lista(fixed_hole);
                         reverte_pos_lista(appear_hole);
                         reverte_pos_lista(plat_movel);
+                        reverte_pos_lista(despenca);
                     }
     
                     if (parou_espinho) {
@@ -315,6 +324,8 @@ int fase_zero(struct mundo *mundo) {
                         reverte_pos_lista(fixed_hole);
                         reverte_pos_lista(appear_hole);
                         reverte_pos_lista(plat_movel);
+                        reverte_pos_lista(plataforma_cai);
+                        reverte_pos_lista(despenca);
                     }
 
                     if (parou_animal) {
@@ -323,6 +334,8 @@ int fase_zero(struct mundo *mundo) {
                         reverte_pos_lista(fixed_hole);
                         reverte_pos_lista(appear_hole);
                         reverte_pos_lista(plat_movel);
+                        reverte_pos_lista(plataforma_cai);
+                        reverte_pos_lista(despenca);
                     }
 
                     if (parou_buracos) {
@@ -331,6 +344,8 @@ int fase_zero(struct mundo *mundo) {
                         reverte_pos_lista(animais);
                         reverte_pos_lista(appear_hole);
                         reverte_pos_lista(plat_movel);
+                        reverte_pos_lista(plataforma_cai);
+                        reverte_pos_lista(despenca);
                     }
                     
                     if (parou_buracos_surge) {
@@ -339,6 +354,8 @@ int fase_zero(struct mundo *mundo) {
                         reverte_pos_lista(animais);
                         reverte_pos_lista(fixed_hole);
                         reverte_pos_lista(plat_movel);
+                        reverte_pos_lista(plataforma_cai);
+                        reverte_pos_lista(despenca);
                     }
 
                     if (parou_plat_movel) {
@@ -347,11 +364,45 @@ int fase_zero(struct mundo *mundo) {
                         reverte_pos_lista(animais);
                         reverte_pos_lista(fixed_hole);
                         reverte_pos_lista(appear_hole);
+                        reverte_pos_lista(plataforma_cai);
+                        reverte_pos_lista(despenca);
+                    }
+
+                    if (parou_plat_cai) {
+                        reverte_pos_lista(espinho);
+                        reverte_pos_lista(lista_plataforma);
+                        reverte_pos_lista(animais);
+                        reverte_pos_lista(fixed_hole);
+                        reverte_pos_lista(appear_hole);
+                        reverte_pos_lista(plat_movel);
+                        reverte_pos_lista(despenca);
+                    }
+
+                    if (parou_despenca) {
+                        reverte_pos_lista(espinho);
+                        reverte_pos_lista(lista_plataforma);
+                        reverte_pos_lista(animais);
+                        reverte_pos_lista(fixed_hole);
+                        reverte_pos_lista(appear_hole);
+                        reverte_pos_lista(plat_movel);
+                        reverte_pos_lista(plataforma_cai);
                     }
                     
                     
                     
+                    
                     if (colide_obs(player, espinho)) {
+                        player->life --;
+                        tentativa_done = true;
+                    }
+
+                    if (colide_obs(player, despenca)) {
+                        player->life --;
+                        tentativa_done = true;
+                    }
+                    
+
+                    if (colide_obs(player, plat_movel)) {
                         player->life --;
                         tentativa_done = true;
                     }
@@ -369,10 +420,15 @@ int fase_zero(struct mundo *mundo) {
 
                     bool in_hole = verifica_colisao_obs_eixo_y(player, fixed_hole);
                     bool in_hole_surge = verifica_colisao_obs_eixo_y(player, appear_hole);
+                    if (colide_obs(player, plataforma_cai)) {
+                        in_hole = true;
+                    }
                     verifica_colisao_obs_eixo_y(player, lista_plataforma);
                     verifica_colisao_obs_eixo_y(player, espinho);
                     verifica_colisao_obs_eixo_y(player, animais);
                     verifica_colisao_obs_eixo_y(player, plat_movel);
+                    verifica_colisao_obs_eixo_y(player, plataforma_cai);
+                    verifica_colisao_obs_eixo_y(player, despenca);
 
                     // Verifica chão - SÓ SE NÃO ESTIVER NO BURACO
                     // Se in_hole for true, ignoramos o chao_y
@@ -394,6 +450,8 @@ int fase_zero(struct mundo *mundo) {
                     salva_pos_anterior_lista(fixed_hole);
                     salva_pos_anterior_lista(appear_hole);
                     salva_pos_anterior_lista(plat_movel);
+                    salva_pos_anterior_lista(plataforma_cai);
+                    salva_pos_anterior_lista(despenca);
     
                     // Limites de movimentação da tela
                     if (player->x < 0) player->x = 0;
@@ -477,6 +535,18 @@ int fase_zero(struct mundo *mundo) {
 
 
                 atual = plat_movel;
+                while (atual != NULL) {
+                    al_draw_filled_rectangle(atual->hitbox->x, atual->hitbox->y, atual->hitbox->x + atual->hitbox->width, atual->hitbox->y + atual->hitbox->height, al_map_rgb(55, 6, 0));
+                    atual = atual->next;              
+                }
+
+                atual = plataforma_cai;
+                while (atual != NULL) {
+                    al_draw_filled_rectangle(atual->hitbox->x, atual->hitbox->y, atual->hitbox->x + atual->hitbox->width, atual->hitbox->y + atual->hitbox->height, al_map_rgb(55, 6, 0));
+                    atual = atual->next;              
+                }
+
+                atual = despenca;
                 while (atual != NULL) {
                     al_draw_filled_rectangle(atual->hitbox->x, atual->hitbox->y, atual->hitbox->x + atual->hitbox->width, atual->hitbox->y + atual->hitbox->height, al_map_rgb(55, 6, 0));
                     atual = atual->next;              

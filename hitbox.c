@@ -401,7 +401,7 @@ void configura_plat_movel(struct hitbox *obs, float distancia_altura, float velo
     obs->min_y = obs->y;
     obs->max_y = obs->y + distancia_altura;
     obs->patrol_speed = velocidade_propria;
-    obs->patrol_dir = 1; // Começa indo para a direita
+    obs->patrol_dir = 1;
 }
 
 // Faz o objeto se mover sozinho dentro dos limites
@@ -428,6 +428,34 @@ void atualiza_lista_plat_movel(struct obstacle *raiz) {
     struct obstacle *atual = raiz;
     while (atual != NULL) {
         atualiza_plataforma(atual->hitbox);
+        atual = atual->next;
+    }
+}
+
+void obs_despenca_horizontal(struct hitbox *obs, int direcao, float velocidade_propria) {
+    if (!obs) {
+        matarProgramaErro(3);
+    }
+
+    obs->min_x = obs->x;
+    obs->patrol_speed = velocidade_propria;
+    obs->patrol_dir = direcao;
+}
+
+// Faz o objeto andar sozinho dentro dos limites
+void obs_despenca_atualiza(struct hitbox *obs) {
+    if (!obs) {
+        matarProgramaErro(3);
+    }
+
+    // Move baseado na velocidade própria e direção atual
+    obs->x += obs->patrol_speed * obs->patrol_dir;
+}
+
+void atualiza_lista_obs_despenca(struct obstacle *raiz) {
+    struct obstacle *atual = raiz;
+    while (atual != NULL) {
+        atualiza_patrulha(atual->hitbox);
         atual = atual->next;
     }
 }

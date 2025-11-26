@@ -76,22 +76,38 @@ movimenta).
 combate.
 
 ### Obstáculos Fase 0
-[x] Plataforma
 [x] Espinhos
 [x] Animal que se move dentro de limite horizontal
 [x] Buraco no chão fixo
-[x] Buraco no chão que surge a cada peŕiodo de tempo
 [x] Plataforma que se move verticalmente
+[x] Plataforma que caí (fazer nuvens que despencam) // Seguir a lógica do buraco
+[ ] Obstáculo que "caí" pela tela vertical
+[ ] Obstáculo que "caí" pela tela horizontal
 
+[x] Buraco no chão que surge a cada peŕiodo de tempo (não conta como obstáculo diferente)
+[x] Plataforma (não é obstáculo)
 ### Obstáculos Fase 1
 [ ] Plataforma superior (player precisa se abaixar)
-[ ] Plataforma que caí (fazer nuvens que despencam)
 [ ] Prensas Hidráulicas
-[ ] Obstáculo que "caí" pela tela horizontal
-[ ] Obstáculo que "caí" pela tela vertical
 [ ] Plataformas que mudam de "estado" -> Nuvem transparente ou sólida
 
 
 ## Fase
 - Pelo menos uma fase completa;
 - Pelo menos 6 elementos de perigo/armadilhas espalhados pela fase.
+
+# TODO Obrigatório
+[ ] 3 Obstáculos
+[ ] Movimentação de abaixar
+[ ] Tela de Game Over
+[ ] Tela de Fim (sucesso)
+[ ] Mudar sprites de tudo
+    [ ] Player
+    [ ] Fundo
+    [ ] Obstáculos
+[ ] Colocar estrela de fim
+[ ] Textinho inicial de história
+[ ] Player voar
+[ ] Sistema de vida (deixar sprites visíveis)
+[ ] Organizar código
+[ ] Mudar fontes

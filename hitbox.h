@@ -18,6 +18,23 @@ typedef struct hitbox {
     float old_x;  
     int life; // de 0 a 5  
     int tipo;
+
+
+    // NOVOS CAMPOS PARA OBTÁCULO COM MOVIMENTO AUTOMÁTICO
+    float patrol_speed;  // Velocidade própria do objeto (independente do player)
+    float min_x, max_x;  // Limites da área de patrulha
+    float old_min_x, old_max_x; 
+    int patrol_dir;      // 1 (direita/cima) ou -1 (esquerda/baixo)
+    
+    // CAMPOS PARA BURACOS QUE SE MOVEM VERTICALMENTE
+    float min_y, max_y;
+    float old_min_y, old_max_y;
+    
+    // CAMPOS PARA BURACO QUE SURGE
+    int timer;
+    bool active;
+    int interval;
+
 } hitbox;
 
 // Lista de obstáculos
@@ -42,7 +59,20 @@ void desenha_lista_obstaculos(struct obstacle *raiz);
 void salva_pos_anterior_lista(struct obstacle *raiz);
 void reverte_pos_lista(struct obstacle *raiz);
 
-void verifica_colisao_obs_eixo_x(struct hitbox *player, struct obstacle *lista_obstaculos, float *back_x, float old_back_x, ALLEGRO_KEYBOARD_STATE key);
-void verifica_colisao_obs_eixo_y(struct hitbox *player, struct obstacle *lista_obstaculos);
+bool verifica_colisao_obs_eixo_x(struct hitbox *player, struct obstacle *lista_obstaculos, float *back_x, float old_back_x, ALLEGRO_KEYBOARD_STATE key);
+bool verifica_colisao_obs_eixo_y(struct hitbox *player, struct obstacle *lista_obstaculos);
+
+bool colide_obs(struct hitbox *a, struct obstacle *b);
+
+void configura_patrulha(struct hitbox *obs, float distancia_patrulha, float velocidade_propria);
+void atualiza_patrulha(struct hitbox *obs);
+void atualiza_lista_patrulha(struct obstacle *raiz);
+
+void configura_buraco_periodico(struct hitbox *obs, int intervalo_frames);
+void atualiza_buracos_periodicos(struct obstacle *raiz);
+
+void atualiza_lista_plat_movel(struct obstacle *raiz);
+void atualiza_patrulha(struct hitbox *obs);
+void configura_plat_movel(struct hitbox *obs, float distancia_altura, float velocidade_propria);
 
 #endif

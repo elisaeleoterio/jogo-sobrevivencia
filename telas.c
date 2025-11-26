@@ -204,154 +204,300 @@ int fase_zero(struct mundo *mundo) {
     }
 
     bool game_done = false;
-    bool redraw = true;
 
     struct hitbox *player = cria_hitbox(100, 100, 10, 15, 2, 0, -10, NULL, PERSONAGEM);
     float velocidade = 10;
-
-    // Plataformas de subir
-    struct obstacle *lista_plataforma = NULL;
-    adicionar_obstaculo(&lista_plataforma, cria_hitbox(mundo->largura - 400, mundo->chao_y - 50, 100, 50, -velocidade, 0, 0, NULL, PLATAFORMA));
-    adicionar_obstaculo(&lista_plataforma, cria_hitbox(mundo->largura - 200, mundo->chao_y - 100, 100, 100, -velocidade, 0, 0, NULL, PLATAFORMA));
-    adicionar_obstaculo(&lista_plataforma, cria_hitbox(mundo->largura - 0, mundo->chao_y - 150, 100, 150, -velocidade, 0, 0, NULL, PLATAFORMA));
-    adicionar_obstaculo(&lista_plataforma, cria_hitbox(mundo->largura + 200, mundo->chao_y - 200, 100, 200, -velocidade, 0, 0, NULL, PLATAFORMA));
-
-
-    // // Obstáculo de espinhos
-    struct obstacle *espinho = NULL;
-    adicionar_obstaculo(&espinho, cria_hitbox(mundo->largura - 300, mundo->chao_y - 30, 100, 30, -velocidade, 0, 0, NULL, ESPINHO));
-    adicionar_obstaculo(&espinho, cria_hitbox(mundo->largura - 100  , mundo->chao_y - 40, 100, 40, -velocidade, 0, 0, NULL, ESPINHO));
-    adicionar_obstaculo(&espinho, cria_hitbox(mundo->largura + 100, mundo->chao_y - 50, 100, 50, -velocidade, 0, 0, NULL, ESPINHO));
-    adicionar_obstaculo(&espinho, cria_hitbox(mundo->largura + 300, mundo->chao_y - 60, 100, 60, -velocidade, 0, 0, NULL, ESPINHO));
-
-    // // Obstáculo de animal que se move (VER COMO QUE FAZ PARA SE MOVER LATERALMENTE COM MAIOR CONSTÂNCIA)
-    // struct hitbox *animal = cria_hitbox(mundo->largura - 400, mundo->chao_y - 50, 100, 50, -velocidade, 0, 0, NULL, PLATAFORMA);
-
-    // // Buraco no chão fixo
-    // struct hitbox *buraco_fixo = cria_hitbox(mundo->largura - 400, mundo->chao_y - 50, 100, 50, -velocidade, 0, 0, NULL, PLATAFORMA);
-
-    // // Plataformas móveis
-    // struct hitbox *plataforma1 = cria_hitbox(mundo->largura - 400, mundo->chao_y - 50, 100, 50, -velocidade, 0, 0, NULL, PLATAFORMA);
-    // struct hitbox *plataforma1 = cria_hitbox(mundo->largura - 400, mundo->chao_y - 50, 100, 50, -velocidade, 0, 0, NULL, PLATAFORMA);
-
-    // // Buraco longo -> Usar habilidade de voar
-    // struct hitbox *plataforma1 = cria_hitbox(mundo->largura - 400, mundo->chao_y - 50, 100, 50, -velocidade, 0, 0, NULL, PLATAFORMA);
-
-    // Posição inicial do background
-    float back_x = 0;
-    // Chão do jogo
-    float chao_y = mundo->altura - 200;
-
-    while (!game_done) {
-        ALLEGRO_EVENT evento;
-        al_wait_for_event(mundo->fila_eventos, &evento);
-        
-        switch (evento.type) {
-            case ALLEGRO_EVENT_TIMER:
-                redraw = true;
-                ALLEGRO_KEYBOARD_STATE key;
-                al_get_keyboard_state(&key);
-
-                // Posições iniciais
-                player->old_x = player->x;
-                float old_back_x = back_x;
-
-                
-                // Movimentar no Eixo X:                
-                movimenta_hitbox(player, key);
-                movimenta_lista_obstaculos(lista_plataforma, key);
-                movimenta_lista_obstaculos(espinho, key);
-                movimenta_background(&back_x, velocidade, key);
-
-                // Verifica colisão no eixo x -> Antes da atuação da gravidade
-                verifica_colisao_obs_eixo_x(player, lista_plataforma, &back_x, old_back_x, key);
-                verifica_colisao_obs_eixo_x(player, espinho, &back_x, old_back_x, key);
-                
-                player->chao = false;
-                    
-                // Implementação da simulação da gravidade
-                player->speed_y += mundo->gravidade;
-                player->y += player->speed_y;
-                    
-                verifica_colisao_obs_eixo_y(player, lista_plataforma);
-                verifica_colisao_obs_eixo_y(player, espinho);
     
-                // Verifica chão
-                if (player->y + player->height > chao_y ) {
-                    player->y = chao_y - player->height;
-                    player->speed_y = 0;
-                    player->chao = true;
-                }
-                
-                salva_pos_anterior_lista(lista_plataforma);
-                salva_pos_anterior_lista(espinho);
 
-                // Limites de movimentação da tela
-                if (player->x < 0) player->x = 0;
-                if (player->x + player->width > mundo->largura/2) player->x = mundo->largura/2 - 10;
-                if (player->y < 0) player->y = 0;
-                if (player->y > mundo->altura) player->y = mundo->altura - player->height; 
-                
-                if (player->steps >= DISTANCIA_MAX || player->life <= 0) {
+    while (!game_done && player->life > 0) {
+        
+        // Plataformas de subir
+        struct obstacle *lista_plataforma = NULL;
+        adicionar_obstaculo(&lista_plataforma, cria_hitbox(mundo->largura - 400, mundo->chao_y - 50, 100, 50, -velocidade, 0, 0, NULL, PLATAFORMA));
+        adicionar_obstaculo(&lista_plataforma, cria_hitbox(mundo->largura - 200, mundo->chao_y - 100, 100, 100, -velocidade, 0, 0, NULL, PLATAFORMA));
+        adicionar_obstaculo(&lista_plataforma, cria_hitbox(mundo->largura - 0, mundo->chao_y - 150, 100, 150, -velocidade, 0, 0, NULL, PLATAFORMA));
+        adicionar_obstaculo(&lista_plataforma, cria_hitbox(mundo->largura + 200, mundo->chao_y - 200, 100, 200, -velocidade, 0, 0, NULL, PLATAFORMA));
+    
+        // // Obstáculo de espinhos
+        struct obstacle *espinho = NULL;
+        adicionar_obstaculo(&espinho, cria_hitbox(mundo->largura - 300, mundo->chao_y - 30, 100, 30, -velocidade, 0, 0, NULL, ESPINHO));
+        adicionar_obstaculo(&espinho, cria_hitbox(mundo->largura - 100  , mundo->chao_y - 40, 100, 40, -velocidade, 0, 0, NULL, ESPINHO));
+        adicionar_obstaculo(&espinho, cria_hitbox(mundo->largura + 100, mundo->chao_y - 50, 100, 50, -velocidade, 0, 0, NULL, ESPINHO));
+        adicionar_obstaculo(&espinho, cria_hitbox(mundo->largura + 300, mundo->chao_y - 60, 100, 60, -velocidade, 0, 0, NULL, ESPINHO));
+    
+        // Obstáculo de animal que se move
+        struct hitbox *animal = cria_hitbox(mundo->largura + 800, mundo->chao_y - 50, 100, 50, -velocidade, 0, 0, NULL, ANIMAL);
+        configura_patrulha(animal, 200, 5);
+        struct obstacle *animais = NULL;
+        adicionar_obstaculo(&animais, animal);
+    
+        // Buraco no chão fixo
+        struct obstacle *fixed_hole = NULL;
+        adicionar_obstaculo(&fixed_hole, cria_hitbox(mundo->largura + 1500, mundo->chao_y - 0.01, 100, 600, -velocidade, 0, 0, NULL, BURACO_FIXO));
+
+        struct hitbox *buraco_surge = cria_hitbox(mundo->largura + 2000, mundo->chao_y, 50, 600, -velocidade, 0, 0, NULL, BURACO_SURGE);
+        configura_buraco_periodico(buraco_surge, 120); // Aparece a cada 2 segundos
+        struct obstacle *appear_hole = NULL;
+        adicionar_obstaculo(&appear_hole, buraco_surge);
+
+        // Obstáculo de plataforma que se move verticalmente
+        struct hitbox *plat_m1 = cria_hitbox(mundo->largura + 2500, mundo->chao_y - 200, 100, 200, -velocidade, 0, 0, NULL, PLATAFORMA_MOVEL);
+        configura_plat_movel(plat_m1, 200, 1);
+        struct obstacle *plat_movel = NULL;
+        adicionar_obstaculo(&plat_movel, plat_m1);
+    
+        // Posição inicial do background
+        float back_x = 0;
+        // Chão do jogo
+        float chao_y = mundo->altura - 200;
+
+        // Resetar Jogador para posição inicial
+        player->x = 100;
+        player->y = 100;
+        player->speed_y = 0;
+        player->steps = 0;
+        player->chao = false;
+
+        bool redraw = true;
+    
+        // Bool para reiniciar a fase caso o jogador perca vida
+        bool tentativa_done = false;
+
+        // Loop da fase para reiniciar se precisar (jogador perde uma vida)
+        while (!tentativa_done) {
+            ALLEGRO_EVENT evento;
+            al_wait_for_event(mundo->fila_eventos, &evento);
+            
+            switch (evento.type) {
+                case ALLEGRO_EVENT_TIMER:
+                    redraw = true;
+                    ALLEGRO_KEYBOARD_STATE key;
+                    al_get_keyboard_state(&key);
+    
+                    // Posições iniciais
+                    player->old_x = player->x;
+                    float old_back_x = back_x;
+    
+                    
+                    // Movimentar no Eixo X:                
+                    movimenta_hitbox(player, key);
+                    movimenta_lista_obstaculos(lista_plataforma, key);
+                    movimenta_lista_obstaculos(espinho, key);
+                    movimenta_lista_obstaculos(animais, key);
+                    movimenta_lista_obstaculos(fixed_hole, key);
+                    movimenta_lista_obstaculos(appear_hole, key);
+                    movimenta_lista_obstaculos(plat_movel, key);
+                    movimenta_background(&back_x, velocidade, key);
+
+                    atualiza_lista_patrulha(animais);
+                    atualiza_lista_plat_movel(plat_movel);
+                    atualiza_buracos_periodicos(appear_hole);
+    
+                    // Verifica colisão no eixo x -> Antes da atuação da gravidade
+                    bool parou_plataforma = verifica_colisao_obs_eixo_x(player, lista_plataforma, &back_x, old_back_x, key);
+                    bool parou_plat_movel = verifica_colisao_obs_eixo_x(player, plat_movel, &back_x, old_back_x, key);
+                    bool parou_espinho = verifica_colisao_obs_eixo_x(player, espinho, &back_x, old_back_x, key);
+                    bool parou_animal = verifica_colisao_obs_eixo_x(player, animais, &back_x, old_back_x, key);
+                    bool parou_buracos = verifica_colisao_obs_eixo_x(player, fixed_hole, &back_x, old_back_x, key);
+                    bool parou_buracos_surge = verifica_colisao_obs_eixo_x(player, appear_hole, &back_x, old_back_x, key);
+    
+                    if (parou_plataforma) {
+                        reverte_pos_lista(espinho);
+                        reverte_pos_lista(animais);
+                        reverte_pos_lista(fixed_hole);
+                        reverte_pos_lista(appear_hole);
+                        reverte_pos_lista(plat_movel);
+                    }
+    
+                    if (parou_espinho) {
+                        reverte_pos_lista(lista_plataforma);
+                        reverte_pos_lista(animais);
+                        reverte_pos_lista(fixed_hole);
+                        reverte_pos_lista(appear_hole);
+                        reverte_pos_lista(plat_movel);
+                    }
+
+                    if (parou_animal) {
+                        reverte_pos_lista(espinho);
+                        reverte_pos_lista(lista_plataforma);
+                        reverte_pos_lista(fixed_hole);
+                        reverte_pos_lista(appear_hole);
+                        reverte_pos_lista(plat_movel);
+                    }
+
+                    if (parou_buracos) {
+                        reverte_pos_lista(espinho);
+                        reverte_pos_lista(lista_plataforma);
+                        reverte_pos_lista(animais);
+                        reverte_pos_lista(appear_hole);
+                        reverte_pos_lista(plat_movel);
+                    }
+                    
+                    if (parou_buracos_surge) {
+                        reverte_pos_lista(espinho);
+                        reverte_pos_lista(lista_plataforma);
+                        reverte_pos_lista(animais);
+                        reverte_pos_lista(fixed_hole);
+                        reverte_pos_lista(plat_movel);
+                    }
+
+                    if (parou_plat_movel) {
+                        reverte_pos_lista(espinho);
+                        reverte_pos_lista(lista_plataforma);
+                        reverte_pos_lista(animais);
+                        reverte_pos_lista(fixed_hole);
+                        reverte_pos_lista(appear_hole);
+                    }
+                    
+                    
+                    
+                    if (colide_obs(player, espinho)) {
+                        player->life --;
+                        tentativa_done = true;
+                    }
+
+                    if (colide_obs(player, animais)) {
+                        player->life --;
+                        tentativa_done = true;
+                    }
+                    
+                    player->chao = false;
+                        
+                    // Implementação da simulação da gravidade
+                    player->speed_y += mundo->gravidade;
+                    player->y += player->speed_y;
+
+                    bool in_hole = verifica_colisao_obs_eixo_y(player, fixed_hole);
+                    bool in_hole_surge = verifica_colisao_obs_eixo_y(player, appear_hole);
+                    verifica_colisao_obs_eixo_y(player, lista_plataforma);
+                    verifica_colisao_obs_eixo_y(player, espinho);
+                    verifica_colisao_obs_eixo_y(player, animais);
+                    verifica_colisao_obs_eixo_y(player, plat_movel);
+
+                    // Verifica chão - SÓ SE NÃO ESTIVER NO BURACO
+                    // Se in_hole for true, ignoramos o chao_y
+                    if (!in_hole_surge && !in_hole && (player->y + player->height > chao_y)) {
+                        player->y = chao_y - player->height;
+                        player->speed_y = 0;
+                        player->chao = true;
+                    }
+
+                    // Se cair muito (caiu no buraco e passou do ecrã), morre
+                    if (player->y > mundo->altura + 100) {
+                        player->life--;
+                        tentativa_done = true;
+                    }
+                    
+                    salva_pos_anterior_lista(lista_plataforma);
+                    salva_pos_anterior_lista(espinho);
+                    salva_pos_anterior_lista(animais);
+                    salva_pos_anterior_lista(fixed_hole);
+                    salva_pos_anterior_lista(appear_hole);
+                    salva_pos_anterior_lista(plat_movel);
+    
+                    // Limites de movimentação da tela
+                    if (player->x < 0) player->x = 0;
+                    if (player->x + player->width > mundo->largura/2) player->x = mundo->largura/2 - 10;
+                    if (player->y < 0) player->y = 0;
+                    
+                    if (player->steps >= DISTANCIA_MAX) {
+                        game_done = true;
+                    }
+                    
+                    break;
+                case ALLEGRO_EVENT_DISPLAY_CLOSE:
                     game_done = true;
+                    break;
+                default:
+                    break;
+            }
+            
+            
+            if (redraw && al_event_queue_is_empty(mundo->fila_eventos)) {
+                
+                al_clear_to_color(al_map_rgb(0, 0, 0));
+                
+                // Definir cores
+                // ALLEGRO_COLOR fundo = al_map_rgb(14, 17, 22);
+                // ALLEGRO_COLOR cor_normal = al_map_rgb(200, 200, 200); // Cinza claro
+                // ALLEGRO_COLOR cor_selecionado = al_map_rgb(251, 116, 168); // Happy Pink
+                // ALLEGRO_COLOR mouse = al_map_rgb(255, 0, 127); // Bright Pink
+                ALLEGRO_COLOR ceu = al_map_rgb(135, 206, 235);
+                
+                int bg_w = al_get_bitmap_width(background);
+                int bg_h = al_get_bitmap_height(background);
+                
+                al_clear_to_color(ceu);
+                
+                float offset_x = fmod(back_x, bg_w);
+                
+                // Desenha a imagem de fundo
+                al_draw_scaled_bitmap(background, 0, 0, bg_w, bg_h, -offset_x, 0, bg_w, mundo->altura, 0);
+                al_draw_scaled_bitmap(background, 0, 0, bg_w, bg_h, -offset_x + bg_w, 0, bg_w, mundo->altura, 0);
+                // TODO: Ver como colocar o fundo para o lado esquerdo
+                
+                // Meu player (temp)
+                al_draw_filled_rectangle(player->x, player->y, player->x + player->width, player->y + player->height, al_map_rgb(255, 0, 0));
+                
+                // Começa em (0, chao_y) e vai até (largura da tela, altura da tela)
+                al_draw_filled_rectangle(0, chao_y, mundo->largura, mundo->altura, al_map_rgb(0, 150, 0)); 
+    
+                // Desenha obstáculos de teste
+                struct obstacle *atual = lista_plataforma;
+                while (atual != NULL) {
+                    al_draw_filled_rectangle(atual->hitbox->x, atual->hitbox->y, atual->hitbox->x + atual->hitbox->width, atual->hitbox->y + atual->hitbox->height, al_map_rgb(0, 0, 255));
+                    atual = atual->next;              
+                }
+    
+                atual = espinho;
+                while (atual != NULL) {
+                    al_draw_filled_rectangle(atual->hitbox->x, atual->hitbox->y, atual->hitbox->x + atual->hitbox->width, atual->hitbox->y + atual->hitbox->height, al_map_rgb(255, 0, 0));
+                    atual = atual->next;              
+                }
+    
+                atual = animais;
+                while (atual != NULL) {
+                    al_draw_filled_rectangle(atual->hitbox->x, atual->hitbox->y, atual->hitbox->x + atual->hitbox->width, atual->hitbox->y + atual->hitbox->height, al_map_rgb(0, 255, 0));
+                    atual = atual->next;              
                 }
                 
-                break;
-            case ALLEGRO_EVENT_DISPLAY_CLOSE:
-                game_done = true;
-                break;
-            default:
-                break;
+                atual = fixed_hole;
+                while (atual != NULL) {
+                    al_draw_filled_rectangle(atual->hitbox->x, atual->hitbox->y, atual->hitbox->x + atual->hitbox->width, atual->hitbox->y + atual->hitbox->height, al_map_rgb(0, 0, 0));
+                    atual = atual->next;              
+                }
+
+                atual = appear_hole;
+                while (atual != NULL) {
+                    if (atual->hitbox->active) {
+                        al_draw_filled_rectangle(atual->hitbox->x, atual->hitbox->y, atual->hitbox->x + atual->hitbox->width, atual->hitbox->y + atual->hitbox->height, al_map_rgb(30, 0, 0));
+                    }
+                    atual = atual->next;              
+                }
+
+
+                atual = plat_movel;
+                while (atual != NULL) {
+                    al_draw_filled_rectangle(atual->hitbox->x, atual->hitbox->y, atual->hitbox->x + atual->hitbox->width, atual->hitbox->y + atual->hitbox->height, al_map_rgb(55, 6, 0));
+                    atual = atual->next;              
+                }
+
+                al_flip_display();
+                redraw = false;
+            }            
         }
-        
-        
-        if (redraw && al_event_queue_is_empty(mundo->fila_eventos)) {
-            
-            al_clear_to_color(al_map_rgb(0, 0, 0));
-            
-            // Definir cores
-            // ALLEGRO_COLOR fundo = al_map_rgb(14, 17, 22);
-            // ALLEGRO_COLOR cor_normal = al_map_rgb(200, 200, 200); // Cinza claro
-            // ALLEGRO_COLOR cor_selecionado = al_map_rgb(251, 116, 168); // Happy Pink
-            // ALLEGRO_COLOR mouse = al_map_rgb(255, 0, 127); // Bright Pink
-            ALLEGRO_COLOR ceu = al_map_rgb(135, 206, 235);
-            
-            int bg_w = al_get_bitmap_width(background);
-            int bg_h = al_get_bitmap_height(background);
-            
-            al_clear_to_color(ceu);
-            
-            float offset_x = fmod(back_x, bg_w);
-            
-            // Desenha a imagem de fundo
-            al_draw_scaled_bitmap(background, 0, 0, bg_w, bg_h, -offset_x, 0, bg_w, mundo->altura, 0);
-            al_draw_scaled_bitmap(background, 0, 0, bg_w, bg_h, -offset_x + bg_w, 0, bg_w, mundo->altura, 0);
-            // TODO: Ver como colocar o fundo para o lado esquerdo
-            
-            // Meu player (temp)
-            al_draw_filled_rectangle(player->x, player->y, player->x + player->width, player->y + player->height, al_map_rgb(255, 0, 0));
-            
-            // Começa em (0, chao_y) e vai até (largura da tela, altura da tela)
-            al_draw_filled_rectangle(0, chao_y, mundo->largura, mundo->altura, al_map_rgb(0, 150, 0)); 
 
-            // Desenha obstáculos de teste
-            struct obstacle *atual = lista_plataforma;
-            while (atual != NULL) {
-                al_draw_filled_rectangle(atual->hitbox->x, atual->hitbox->y, atual->hitbox->x + atual->hitbox->width, atual->hitbox->y + atual->hitbox->height, al_map_rgb(0, 0, 255));
-                atual = atual->next;              
-            }
-
-            atual = espinho;
-            while (atual != NULL) {
-                al_draw_filled_rectangle(atual->hitbox->x, atual->hitbox->y, atual->hitbox->x + atual->hitbox->width, atual->hitbox->y + atual->hitbox->height, al_map_rgb(255, 0, 0));
-                atual = atual->next;              
-            }
-
-            
-            al_flip_display();
-            redraw = false;
-        }
-        
+        // Limpeza da Memória da Tentativa (IMPORTANTE)
+        destruir_lista_obstaculos(lista_plataforma);
+        destruir_lista_obstaculos(espinho);
+        destruir_lista_obstaculos(animais);
     }
+
+    // Limpeza final
+    destruir_hitbox(player);
+    al_destroy_bitmap(background);
+    
+    if (player->life <= 0) printf("Game Over!\n");
+    
     return 0; // TEMP
 }

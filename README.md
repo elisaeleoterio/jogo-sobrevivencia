@@ -17,6 +17,12 @@
 8. Ajeitar sprites
 9. Ver como carregar obstáculos
     - Tem que aparecer ao poucos, quando o jogador estiver no passo x
+10. Criar movimentação abaixado
+
+
+### FUNCIONALIDADES EXTRAS:
+20 pts, Implementar uma segunda fase, com background diferente e um
+conjunto inédito de obstáculos.
 
 ### Allegro Addons:
 
@@ -38,3 +44,54 @@ allegro_native_dialog -> allegro
 
 ### ERROS
 - Não está verificando corretamente a colisão com um obstáculo
+
+
+
+
+# REQUISITOS MÍNIMOS
+
+- Implementação de um jogo singleplayer;
+- Implementação de um menu inicial, permitindo iniciar ou sair do jogo;
+- Implementação de uma tela de fim de jogo, indicando se o final foi alcançado com sucesso ou não (game over).
+
+## Personagem:
+- Sprites 2D (imagem) para as seguintes ações:
+    - Em pé;
+    - Abaixado;
+    - Pulando;
+    - Andando em pé;
+    - Em ação de interação/desvio (ex: balançando ou escalando)
+- Mobilidade geral: Andar, pular, e a ação de interação/desvio.
+- Sistema de pontos de vida que reduz progressivamente conforme colisão recebida por perigos/armadilhas.
+
+## Cenário
+- Um cenário com background de imagem;
+- Rolling background (o cenário muda conforme o jogador se
+movimenta).
+
+## Obstáculos
+- Pelo menos 6 elementos de perigo e armadilhas espalhados pela fase, que o jogador deve desviar/saltar. Estes devem incluir pelo menos um tipo de perigo em movimento (ex: plataformas móveis, troncos rolando, animais que causam dano por contato).
+- Todos os perigos/obstáculos devem ter suas respectivas sprites e movimento (se aplicável).
+- Ataque (dano) é causado por contato/colisão, não por projéteis ou
+combate.
+
+### Obstáculos Fase 0
+[x] Plataforma
+[x] Espinhos
+[x] Animal que se move dentro de limite horizontal
+[x] Buraco no chão fixo
+[x] Buraco no chão que surge a cada peŕiodo de tempo
+[x] Plataforma que se move verticalmente
+
+### Obstáculos Fase 1
+[ ] Plataforma superior (player precisa se abaixar)
+[ ] Plataforma que caí (fazer nuvens que despencam)
+[ ] Prensas Hidráulicas
+[ ] Obstáculo que "caí" pela tela horizontal
+[ ] Obstáculo que "caí" pela tela vertical
+[ ] Plataformas que mudam de "estado" -> Nuvem transparente ou sólida
+
+
+## Fase
+- Pelo menos uma fase completa;
+- Pelo menos 6 elementos de perigo/armadilhas espalhados pela fase.

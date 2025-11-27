@@ -7,6 +7,6 @@
 #ifndef _MENU_H_
 #define _MENU_H_
 
-int menu(struct mundo *mundo);
+int screen(struct mundo *mundo, char *title, char *subtitle, char *button1, char *button2);
 
 #endif

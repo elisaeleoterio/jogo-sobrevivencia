@@ -44,6 +44,7 @@ void configura_player(struct hitbox *hit, float speed_y, float forca_pulo) {
     hit->life = 5;
     hit->max_fly = 180; // 180 frames = 3 segundos de voo
     hit->fly_timer = hit->max_fly; // Começa cheio
+    hit->def_height = hit->height;
 }
 
 void configura_animal(struct hitbox *obs, float distancia, float velocidade_propria) {
@@ -126,10 +127,26 @@ void movimenta_hitbox(struct hitbox *a, ALLEGRO_KEYBOARD_STATE key) {
         }
         a->steps--;  
     }
-    if (al_key_down(&key, ALLEGRO_KEY_DOWN)) {
-        // Mudar a imagem do sprite para abaixar
-        // Diminuir a velocidade
-        // Mudar temporariamente a altura do hitbox
+    bool agachado = false;
+    if (al_key_down(&key, ALLEGRO_KEY_DOWN) && a->chao) {
+        // Só agacha se estiver no chão
+        // Se ainda está em pé, agacha
+        if (a->height == a->def_height) {
+            float metade_altura = a->def_height / 2.0;
+            // Ajusta o Y para que os pés continuem no chão ao encolher
+            a->y += (a->def_height - metade_altura); 
+            a->height = metade_altura;
+        }
+        agachado = true;
+    } else {
+        // LEVANTAR
+        // Se soltou a tecla e está agachado (altura menor que o padrão)
+        if (a->height < a->def_height) {
+            // Ajusta o Y para crescer
+            a->y -= (a->def_height - a->height);
+            a->height = a->def_height;
+            agachado = false;
+        }
     }
     if (al_key_down(&key, ALLEGRO_KEY_UP) && a->chao) {
         a->speed_y += a->forca_pulo;

@@ -34,13 +34,37 @@ int main() {
     // Loop principal do jogo
     while (!game_done) {
         // Roda o menu e verifica a escolha do usuário
-        int selected_option = menu(mundo);
+        int selected_option = screen(mundo, "MENU", NULL, "Start", "Exit");
         
         // Selecionou a opção START
         if (selected_option == 1) {
-            fase_zero(mundo);
-            printf("Entrar na Fase 0\n");
-            game_done = true; // TEMPORÀRIO
+            // Loop da Fase (Permite reiniciar sem voltar ao menu principal)
+            bool fase = true;
+            while (fase) {
+                int resultado = fase_zero(mundo);
+                
+                // 1 = Vitória
+                if (resultado == 1) {
+                    int end_option = screen(mundo, "Parabéns!", "Missão cumprida!", "Restart", "Exit");
+                    
+                    if (end_option == 2) { // Exit
+                        fase = false;
+                        game_done = true;
+                    }
+                    // Se end_option == 1 (Restart), o loop while(fase_rodando) continua e chama fase_zero novamente
+                } 
+                // 0 = Derrota (Game Over)
+                else if (resultado == 0) {
+                    int end_option = screen(mundo, "Game Over", "Tente novamente!", "Restart", "Exit");
+                    
+                    if (end_option == 2) { // Exit
+                        fase = false;
+                        game_done = true;
+                    }
+                }
+            }
+            
+            
         // Selecionou a opção EXIT
         } else if (selected_option == 2) {
             // Terminar jogo e fechar tela

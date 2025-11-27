@@ -12,12 +12,12 @@
 #include "hitbox.h"
 #include "menu.h"
 
-int screen(struct mundo *mundo, char *title, char *subtitle, char *button1, char *button2) {
+int game_over(struct mundo *mundo) {
     if (!mundo) {
         matar_pont_nulo();
     }
     
-    // Carrega imagem de fundo do menu
+    // Carrega imagem de fundo
     ALLEGRO_BITMAP *background = al_load_bitmap("assets/images/menu_background.jpg");
     if (!background) {
         matarProgramaErro(4);
@@ -31,32 +31,21 @@ int screen(struct mundo *mundo, char *title, char *subtitle, char *button1, char
     }
 
     // Carrega a fonte que será utilizada
-    ALLEGRO_FONT *font_title = al_load_font("assets/fonts/LaBelleAurore-Regular.ttf", 70, 0);
-    if (!font_title) {
+    ALLEGRO_FONT *font_go = al_load_font("assets/fonts/LaBelleAurore-Regular.ttf", 60, 0);
+    if (!font_go) {
         al_destroy_bitmap(background);
         al_destroy_bitmap(mouse_cursor);
         matarProgramaErro(4);
     }
-    
-    ALLEGRO_FONT *font_subtitle = al_load_font("assets/fonts/LaBelleAurore-Regular.ttf", 35, 0);
-    if (!font_subtitle) {
-        al_destroy_bitmap(background);
-        al_destroy_bitmap(mouse_cursor);
-        al_destroy_font(title);
-        matarProgramaErro(4);
-    }
-    
     ALLEGRO_FONT *font_button = al_load_font("assets/fonts/LaBelleAurore-Regular.ttf", 50, 0);
     if (!font_button) {
         al_destroy_bitmap(background);
         al_destroy_bitmap(mouse_cursor);
-        al_destroy_font(title);
-        al_destroy_font(subtitle);
         matarProgramaErro(4);
     }
 
     // Variáveis de estado do menu
-    bool screen_done = false;
+    bool go_done = false;
     // Flag para controlar quando desenhar na tela
     bool redraw = true; 
 
@@ -64,28 +53,27 @@ int screen(struct mundo *mundo, char *title, char *subtitle, char *button1, char
     int mouse_x = 0;
     int mouse_y = 0;
 
-    // 0 = nenhum, 1 = Start, 2 = Exit
+    // 0 = nenhum, 1 = Restart, 2 = Exit
     int selected_option = 0; 
 
     // Loop principal do menu
-    while (!screen_done) {
+    while (!go_done) {
         
         // Armazena a altura a font
-        int font_height = al_get_font_line_height(font_title);
+        int font_height = al_get_font_line_height(font_go);
 
         // Ponto X central
-        float screen_x = mundo->largura / 2.0; 
+        float go_x = mundo->largura / 2.0; 
         // Ponto Y central
-        float screen_y = mundo->altura / 4.0;
+        float go_y = mundo->altura / 4.0;
 
         // Espaçamento entre os itens
-        float padding = font_height * 0.5; // Meia linha de espaço
+        float padding = font_height * 1; // Meia linha de espaço
 
         // Posições Y para desenhar o texto (al_draw_text usa o Y do topo)
-        float title_y = screen_y;
-        float subtitle_y = screen_y + padding;
-        float bt1_y = screen_y + 2*padding;
-        float bt2_y = bt1_y + 2*padding; 
+        float title_y = menu_y;
+        float start_y = menu_y + padding;
+        float exit_y = start_y + padding; 
 
         ALLEGRO_EVENT evento;
         // Espera por um evento (do usuário ou do timer)
@@ -95,26 +83,26 @@ int screen(struct mundo *mundo, char *title, char *subtitle, char *button1, char
             // Realiza esse evento a cada tique do timer - Verificação da seleção das opções do menu
             case ALLEGRO_EVENT_TIMER: 
                 // Obter as larguras dos textos
-                float bt1_text_width = al_get_text_width(font_button, button1);
-                float bt2_text_width = al_get_text_width(font_button, button2);
+                float start_text_width = al_get_text_width(font_button, "START");
+                float exit_text_width = al_get_text_width(font_button, "EXIT");
 
                 // Definir as áreas das hitboxes
-                // BOTÃO 1
-                float bt1_x1 = screen_x - (bt1_text_width / 2.0);
-                float bt1_x2 = screen_x + (bt1_text_width / 2.0);
-                float bt1_y1 = bt1_y; // Y do topo (usado no al_draw_text)
-                float bt1_y2 = bt1_y + font_height; // Y da base
+                // BOTÃO START
+                float start_x1 = menu_x - (start_text_width / 2.0);
+                float start_x2 = menu_x + (start_text_width / 2.0);
+                float start_y1 = start_y; // Y do topo (usado no al_draw_text)
+                float start_y2 = start_y + font_height; // Y da base
 
-                // BOTÃO 2
-                float bt2_x1 = screen_x - (bt2_text_width / 2.0);
-                float bt2_x2 = screen_x + (bt2_text_width / 2.0);
-                float bt2_y1 = bt2_y; // Y do topo
-                float bt2_y2 = bt2_y + font_height; // Y da base
+                // BOTÃO EXIT
+                float exit_x1 = menu_x - (exit_text_width / 2.0);
+                float exit_x2 = menu_x + (exit_text_width / 2.0);
+                float exit_y1 = exit_y; // Y do topo
+                float exit_y2 = exit_y + font_height; // Y da base
             
                 // Verificação se o mouse está encima de algum botão (muda a cor)
-                if ((mouse_x >= bt1_x1 && mouse_x <= bt1_x2) && (mouse_y >= bt1_y1 && mouse_y <= bt1_y2)) {
+                if ((mouse_x >= start_x1 && mouse_x <= start_x2) && (mouse_y >= start_y1 && mouse_y <= start_y2)) {
                     selected_option = 1;
-                } else if ((mouse_x >= bt2_x1 && mouse_x <= bt2_x2) && (mouse_y >= bt2_y1 && mouse_y <= bt2_y2)) {
+                } else if ((mouse_x >= exit_x1 && mouse_x <= exit_x2) && (mouse_y >= exit_y1 && mouse_y <= exit_y2)) {
                     selected_option = 2;
                 } else {
                     selected_option = 0;
@@ -132,15 +120,15 @@ int screen(struct mundo *mundo, char *title, char *subtitle, char *button1, char
             // Realiza esse evento se o usuário selecionar alguma opçao do menu
             case ALLEGRO_EVENT_MOUSE_BUTTON_DOWN:
                 if (selected_option == 1) {
-                    printf("Botão 1 pressionado.\n");
-                    screen_done = true;
+                    printf("Botão START pressionado.\n");
+                    menu_done = true;
                 } else if (selected_option == 2) {
-                    printf("Botão 2 selecionado.\n");
-                    screen_done = true;
+                    printf("Botão EXIT selecionado.\n");
+                    menu_done = true;
                 }
                 break;
             case ALLEGRO_EVENT_DISPLAY_CLOSE:
-                screen_done = true;
+                menu_done = true;
                 break;
             default:
                 break;
@@ -153,6 +141,7 @@ int screen(struct mundo *mundo, char *title, char *subtitle, char *button1, char
             ALLEGRO_COLOR fundo = al_map_rgb(14, 17, 22);
             ALLEGRO_COLOR cor_normal = al_map_rgb(255, 185, 210); // Blush Pop
             ALLEGRO_COLOR cor_selecionado = al_map_rgb(251, 116, 168); // Happy Pink
+            ALLEGRO_COLOR mouse = al_map_rgb(255, 0, 127); // Bright Pink
             
             // Reseta para a cor de fundo
             al_clear_to_color(fundo);
@@ -163,17 +152,11 @@ int screen(struct mundo *mundo, char *title, char *subtitle, char *button1, char
             al_draw_scaled_bitmap(background, 0, 0, background_width, background_heitgh, 0, 0, mundo->largura, mundo->altura, ALLEGRO_MAG_LINEAR);
             
             // Título
-            al_draw_text(font_title, cor_normal, screen_x, title_y, ALLEGRO_ALIGN_CENTER, title);
-
-            // Subtitulo (se tiver)
-            if (subtitle) {
-                al_draw_text(font_subtitle, cor_normal, screen_x, subtitle_y, ALLEGRO_ALIGN_CENTER, subtitle);
-            }
-            
-            // Botão 1
-            al_draw_text(font_button, (selected_option == 1) ? cor_selecionado : cor_normal, screen_x, bt1_y, ALLEGRO_ALIGN_CENTER, button1);
-            // Botão 2
-            al_draw_text(font_button, (selected_option == 2) ? cor_selecionado : cor_normal, screen_x, bt2_y, ALLEGRO_ALIGN_CENTER, button2);
+            al_draw_text(font_menu, cor_normal, menu_x, title_y, ALLEGRO_ALIGN_CENTER, "MENU");
+            // START
+            al_draw_text(font_button, (selected_option == 1) ? cor_selecionado : cor_normal, menu_x, start_y, ALLEGRO_ALIGN_CENTER, "start");
+            // EXIT
+            al_draw_text(font_button, (selected_option == 2) ? cor_selecionado : cor_normal, menu_x, exit_y, ALLEGRO_ALIGN_CENTER, "exit");
 
             // Desenhar mouse falso
             int mouse_width = al_get_bitmap_width(mouse_cursor);
@@ -191,8 +174,7 @@ int screen(struct mundo *mundo, char *title, char *subtitle, char *button1, char
     al_destroy_bitmap(mouse_cursor);
     al_destroy_bitmap(background);
     al_destroy_font(font_button);
-    al_destroy_font(font_title);
-    al_destroy_font(font_subtitle);
+    al_destroy_font(font_menu);
 
     return selected_option;
 }

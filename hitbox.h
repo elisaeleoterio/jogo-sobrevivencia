@@ -47,6 +47,9 @@ typedef struct hitbox {
     float fly_timer;
     float max_fly;
 
+    // Ação de abaixar
+    float def_height;
+
 
     // NOVOS CAMPOS PARA OBTÁCULO COM MOVIMENTO AUTOMÁTICO
     float mov_speed;  // Velocidade própria do objeto (independente do player)

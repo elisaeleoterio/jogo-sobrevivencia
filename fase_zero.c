@@ -26,15 +26,24 @@ int fase_zero(struct mundo *mundo) {
         return 1;
     }
 
-    ALLEGRO_BITMAP *nuvem1 = al_load_bitmap("assets/images/nuvem1.png");
-    if (!nuvem1) {
+    ALLEGRO_BITMAP *vida = al_load_bitmap("assets/images/vida.png");
+    if (!vida) {
         al_destroy_bitmap(background);
         return 1;
     }
+
+    ALLEGRO_BITMAP *nuvem1 = al_load_bitmap("assets/images/nuvem1.png");
+    if (!nuvem1) {
+        al_destroy_bitmap(background);
+        al_destroy_bitmap(vida);
+        return 1;
+    }
+
    
     ALLEGRO_BITMAP *nuvem2 = al_load_bitmap("assets/images/nuvem2.png");
     if (!nuvem2) {
         al_destroy_bitmap(background);
+        al_destroy_bitmap(vida);
         al_destroy_bitmap(nuvem1);
         return 1;
     }
@@ -42,6 +51,7 @@ int fase_zero(struct mundo *mundo) {
     ALLEGRO_BITMAP *espinho1 = al_load_bitmap("assets/images/espinho1.png");
     if (!espinho1) {
         al_destroy_bitmap(background);
+        al_destroy_bitmap(vida);
         al_destroy_bitmap(nuvem1);
         al_destroy_bitmap(nuvem2);
         return 1;
@@ -50,10 +60,22 @@ int fase_zero(struct mundo *mundo) {
     ALLEGRO_BITMAP *espinho2 = al_load_bitmap("assets/images/espinho2.png");
     if (!espinho1) {
         al_destroy_bitmap(background);
+        al_destroy_bitmap(vida);
         al_destroy_bitmap(nuvem1);
         al_destroy_bitmap(nuvem2);
         al_destroy_bitmap(espinho1);
         return 1;
+    }
+
+    ALLEGRO_FONT *font = al_load_font("assets/fonts/LaBelleAurore-Regular.ttf", 50, 0);
+    if (!font) {
+        al_destroy_bitmap(background);
+        al_destroy_bitmap(vida);
+        al_destroy_bitmap(nuvem1);
+        al_destroy_bitmap(nuvem2);
+        al_destroy_bitmap(espinho1);
+        al_destroy_bitmap(espinho2);
+        matarProgramaErro(4);
     }
 
     bool game_done = false;
@@ -62,7 +84,7 @@ int fase_zero(struct mundo *mundo) {
     float chao_y = mundo->altura - 200;
 
 
-    struct hitbox *player = cria_hitbox(100, 100, 10, 15, 2, NULL, T_PERSONAGEM);
+    struct hitbox *player = cria_hitbox(100, 100, 10, 50, 2, NULL, T_PERSONAGEM);
     configura_player(player, 2, -10);
     
     // Vetor para armazenar as listas de obstáculos
@@ -80,61 +102,40 @@ int fase_zero(struct mundo *mundo) {
         player->max_fly = 60; // 180 frames = 3 segundos de voo
         player->fly_timer = player->max_fly; // Começa cheio
 
-        // // Nuvens de níveis diferentes (por onde anda normalmente)
-        // adicionar_obstaculo(&obstaculos[L_NUVEM], cria_hitbox(50, chao_y - 50, 200, 50, -velocidade, NULL, T_NUVEM));
-        // adicionar_obstaculo(&obstaculos[L_NUVEM], cria_hitbox(400, chao_y - 80, 100, 80, -velocidade, NULL, T_NUVEM));
-        // adicionar_obstaculo(&obstaculos[L_NUVEM], cria_hitbox(mundo->largura - 200, mundo->chao_y - 100, 100, 100, -velocidade, NULL, T_NUVEM));
-        // adicionar_obstaculo(&obstaculos[L_NUVEM], cria_hitbox(mundo->largura - 0, mundo->chao_y - 150, 100, 150, -velocidade, NULL, T_NUVEM));
-        // adicionar_obstaculo(&obstaculos[L_NUVEM], cria_hitbox(mundo->largura + 200, mundo->chao_y - 200, 100, 200, -velocidade, NULL, T_NUVEM));
+        // nuvem pro jogador spwanar
+        adicionar_obstaculo(&obstaculos[L_NUVEM], cria_hitbox(50, chao_y, 300, 50, -velocidade, nuvem1, T_NUVEM));
 
-        // // Nuvem com espinhos (sprite de raios)
-        // adicionar_obstaculo(&obstaculos[L_ESPINHO], cria_hitbox(mundo->largura - 300, mundo->chao_y - 30, 100, 30, -velocidade, NULL, T_ESPINHO));
-        // adicionar_obstaculo(&obstaculos[L_ESPINHO], cria_hitbox(mundo->largura - 100  , mundo->chao_y - 40, 100, 40, -velocidade, NULL, T_ESPINHO));
-        // adicionar_obstaculo(&obstaculos[L_ESPINHO], cria_hitbox(mundo->largura + 100, mundo->chao_y - 50, 100, 50, -velocidade, NULL, T_ESPINHO));
-        // adicionar_obstaculo(&obstaculos[L_ESPINHO], cria_hitbox(mundo->largura + 300, mundo->chao_y - 60, 100, 60, -velocidade, NULL, T_ESPINHO));
-    
-        // // Animal que se move
-        // struct hitbox *animal = cria_hitbox(mundo->largura + 800, mundo->chao_y - 50, 100, 50, -velocidade, NULL, T_ANIMAL);
-        // configura_animal(animal, 200, 5);
-        // adicionar_obstaculo(&obstaculos[L_ANIMAL], animal);
-    
-        // // Buraco que surge periódicamente
-        // struct hitbox *buraco_surge = cria_hitbox(mundo->largura + 2000, mundo->chao_y, 50, 600, -velocidade, NULL, T_BURACO);
-        // configura_buraco(buraco_surge, 120); // Aparece a cada 2 segundos
-        // adicionar_obstaculo(&obstaculos[L_BURACO], buraco_surge);
-
-        // // Nuvem que se move verticalmente
-        // struct hitbox *plat_m1 = cria_hitbox(mundo->largura + 2500, 0, 100, 700, -velocidade, NULL, T_NUVEM_MOVEL);
-        // configura_nuvem_movel(plat_m1, 200, 2);
-        // adicionar_obstaculo(&obstaculos[L_NUVEM_MOVEL], plat_m1);
-
-        adicionar_obstaculo(&obstaculos[L_NUVEM], cria_hitbox(50, chao_y, 300, 50, -velocidade, NULL, T_NUVEM));
-
-        // Degraus Simples (Sobe e Desce)
-        adicionar_obstaculo(&obstaculos[L_NUVEM], cria_hitbox(450, chao_y - 50, 150, 50, -velocidade, NULL, T_NUVEM));
-        adicionar_obstaculo(&obstaculos[L_NUVEM], cria_hitbox(700, chao_y - 100, 150, 50, -velocidade, NULL, T_NUVEM));
-        adicionar_obstaculo(&obstaculos[L_NUVEM], cria_hitbox(950, chao_y - 50, 150, 50, -velocidade, NULL, T_NUVEM));
+        // nuvens simples (jogador pegar o jeito)
+        adicionar_obstaculo(&obstaculos[L_NUVEM], cria_hitbox(450, chao_y - 50, 150, 50, -velocidade, nuvem1, T_NUVEM));
+        adicionar_obstaculo(&obstaculos[L_NUVEM], cria_hitbox(700, chao_y - 100, 150, 50, -velocidade, nuvem1, T_NUVEM));
+        adicionar_obstaculo(&obstaculos[L_NUVEM], cria_hitbox(950, chao_y - 50, 150, 50, -velocidade, nuvem1, T_NUVEM));
         
-        // Plataforma de descanso
-        adicionar_obstaculo(&obstaculos[L_NUVEM], cria_hitbox(1200, chao_y, 200, 50, -velocidade, NULL, T_NUVEM));
+        // Plataforma com espinho encima
+        adicionar_obstaculo(&obstaculos[L_NUVEM], cria_hitbox(1200, chao_y, 800, 50, -velocidade, NULL, T_NUVEM));
+        adicionar_obstaculo(&obstaculos[L_ESPINHO], cria_hitbox(1400, chao_y - player->height / 2 - player->height, 500, player->height / 2 + 10, -velocidade, NULL, T_ESPINHO));
 
-        // --- PARTE 2: PLATAFORMA MÓVEL (ELEVADOR) ---
-        // O jogador precisa esperar o elevador descer
-        struct hitbox *elevador = cria_hitbox(1600, chao_y - 200, 150, 30, -velocidade, NULL, T_NUVEM_MOVEL);
-        configura_nuvem_movel(elevador, 250, 3); // Sobe 250 pixels
-        adicionar_obstaculo(&obstaculos[L_NUVEM_MOVEL], elevador);
+        adicionar_obstaculo(&obstaculos[L_NUVEM], cria_hitbox(2100, chao_y - 50, 100, 50, -velocidade, NULL, T_NUVEM));
 
-        // Plataforma Alta (Destino do elevador)
-        adicionar_obstaculo(&obstaculos[L_NUVEM], cria_hitbox(1850, chao_y - 100, 300, 50, -velocidade, NULL, T_NUVEM));
-
-        // --- PARTE 3: O CORREDOR DO INIMIGO ---
-        // Uma plataforma longa no alto com um inimigo patrulhando
-        struct hitbox *plataforma_inimigo = cria_hitbox(2300, chao_y - 250, 500, 50, -velocidade, NULL, T_NUVEM);
-        adicionar_obstaculo(&obstaculos[L_NUVEM], plataforma_inimigo);
-
+        // plataforma com um animal
+        adicionar_obstaculo(&obstaculos[L_NUVEM], cria_hitbox(2300, chao_y - 250, 500, 50, -velocidade, NULL, T_NUVEM));
         struct hitbox *inimigo = cria_hitbox(2400, chao_y - 300, 50, 50, -velocidade, NULL, T_ANIMAL);
-        configura_animal(inimigo, 300, 4); // Patrulha 300px
+        configura_animal(inimigo, 300, 6); // Patrulha 300px
         adicionar_obstaculo(&obstaculos[L_ANIMAL], inimigo);
+
+        // Plataforma longa com prensa
+        adicionar_obstaculo(&obstaculos[L_NUVEM], cria_hitbox(2900, chao_y - 325, 700, 50, -velocidade, NULL, T_NUVEM));
+        // jogador precisa esperar a prensa subir para passar
+        struct hitbox *prensa1 = cria_hitbox(3000, chao_y - 850, 150, 300, -velocidade, NULL, T_NUVEM_MOVEL);
+        configura_nuvem_movel(prensa1, 250, 8); // Sobe 250 pixels
+        adicionar_obstaculo(&obstaculos[L_NUVEM_MOVEL], prensa1);
+        struct hitbox *prensa2 = cria_hitbox(3200, chao_y - 850, 150, 300, -velocidade, NULL, T_NUVEM_MOVEL);
+        configura_nuvem_movel(prensa2, 250, 7); // Sobe 250 pixels
+        adicionar_obstaculo(&obstaculos[L_NUVEM_MOVEL], prensa2);
+        struct hitbox *prensa3 = cria_hitbox(3400, chao_y - 850, 150, 300, -velocidade, NULL, T_NUVEM_MOVEL);
+        configura_nuvem_movel(prensa3, 250, 8); // Sobe 250 pixels
+        adicionar_obstaculo(&obstaculos[L_NUVEM_MOVEL], prensa3);
+        
+
 
         adicionar_obstaculo(&obstaculos[L_NUVEM], cria_hitbox(3000, chao_y - 100, 150, 50, -velocidade, NULL, T_NUVEM));
         
@@ -295,19 +296,29 @@ int fase_zero(struct mundo *mundo) {
                     atual = atual->next;              
                 }
                 
-                // --- DESENHO DA INTERFACE DO JETPACK ---
-                // Barra de fundo (Cinza)
-                al_draw_filled_rectangle(20, 20, 220, 40, al_map_rgb(50, 50, 50));
-                
+                // barra de voo
+                al_draw_filled_rectangle(20, 40, 220, 60, al_map_rgb(50, 50, 50));
                 // Cálculo da largura proporcional ao combustível
                 float largura_combustivel = ((float)player->fly_timer / player->max_fly) * 200.0;
-                
-                // Barra de combustível (Amarela se cheio, Vermelha se acabando)
-                ALLEGRO_COLOR cor_jet = al_map_rgb(255, 200, 0);
-                if (player->fly_timer < 50) cor_jet = al_map_rgb(255, 50, 50);
-                
-                al_draw_filled_rectangle(20, 20, 20 + largura_combustivel, 40, cor_jet);
+                ALLEGRO_COLOR cor_jet = al_map_rgb(221, 74, 147);
+                al_draw_filled_rectangle(20, 40, 20 + largura_combustivel, 60, cor_jet);
+                al_draw_text(font, cor_jet, 55 + largura_combustivel, 10, ALLEGRO_ALIGN_CENTER, "Voo");
 
+                // Desenhar ícones de vida
+                int vida_w = al_get_bitmap_width(vida);
+                int vida_h = al_get_bitmap_height(vida);
+                
+                // Definições de tamanho na tela
+                float tamanho_icone = 40.0; // Tamanho desejado (40x40)
+                float espacamento = 10.0;
+                float start_x = 20.0;
+                float start_y = 80.0; // Logo abaixo da barra de voo
+
+                for (size_t i = 0; i < player->life; i++) {
+                    al_draw_tinted_scaled_bitmap(vida, cor_jet, 0, 0, vida_w, vida_h, start_x + (tamanho_icone + espacamento) * i, start_y, tamanho_icone, tamanho_icone, 0);
+                }
+                al_draw_text(font, cor_jet, start_x + (tamanho_icone + espacamento) * (player->life + 1), start_y - 20, ALLEGRO_ALIGN_CENTER, "Vida");
+                
                 al_flip_display();
                 redraw = false;
             }            
@@ -323,8 +334,11 @@ int fase_zero(struct mundo *mundo) {
     // Limpeza final
     destruir_hitbox(player);
     al_destroy_bitmap(background);
-    
-    if (player->life <= 0) printf("Game Over!\n");
-    
-    return 0; // TEMP
+    al_destroy_bitmap(vida);
+    al_destroy_bitmap(nuvem1);
+    al_destroy_bitmap(nuvem2);
+    al_destroy_bitmap(espinho1);
+    al_destroy_bitmap(espinho2);
+    al_destroy_font(font);
+    return 1;
 }

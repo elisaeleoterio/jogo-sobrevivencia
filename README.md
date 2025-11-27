@@ -98,16 +98,23 @@ combate.
 
 # TODO Obrigatório
 [ ] 3 Obstáculos
-[ ] Movimentação de abaixar
-[ ] Tela de Game Over
-[ ] Tela de Fim (sucesso)
+    [x] Espinho (nuvem com raio)
+    [x] Animal que se move
+    [x] Plataforma móvel que mata ao encostar (prensa)
+    [ ] Nuvem que aparece e desaparece (usar buraco)
+    [ ] Plataforma que caí quando o player sobe
+    [ ] Raios verticais
+[x] Movimentação de abaixar
+[x] Tela de Game Over
+[x] Tela de Fim (sucesso)
 [ ] Mudar sprites de tudo
+    [ ] Arrumar sprite de fundo
     [ ] Player
     [x] Fundo
     [ ] Obstáculos
 [ ] Colocar estrela de fim
 [ ] Textinho inicial de história
 [x] Player voar
-[ ] Sistema de vida (deixar sprites visíveis)
+[x] Sistema de vida (deixar sprites visíveis)
 [x] Organizar código
 [x] Mudar fontes

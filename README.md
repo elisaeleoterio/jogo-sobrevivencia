@@ -103,11 +103,11 @@ combate.
 [ ] Tela de Fim (sucesso)
 [ ] Mudar sprites de tudo
     [ ] Player
-    [ ] Fundo
+    [x] Fundo
     [ ] Obstáculos
 [ ] Colocar estrela de fim
 [ ] Textinho inicial de história
-[ ] Player voar
+[x] Player voar
 [ ] Sistema de vida (deixar sprites visíveis)
-[ ] Organizar código
-[ ] Mudar fontes
+[x] Organizar código
+[x] Mudar fontes

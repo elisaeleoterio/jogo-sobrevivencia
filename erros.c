@@ -25,3 +25,13 @@ void matarProgramaErro(int codigo) {
         break;
     }
 }
+
+void matar_falta_memoria() {
+    fprintf(stderr, "Erro de alocação de memóra.\n");
+    exit(1);
+}
+
+void matar_pont_nulo() {
+    fprintf(stderr, "Ponteiro Nulo.\n");
+    exit(1);
+}

@@ -9,8 +9,9 @@
 
 #include "erros.h"
 #include "inicio.h"
-#include "telas.h"
+#include "fase_zero.h"
 #include "hitbox.h"
+#include "menu.h"
 
 int main() {
     // Inicialização e criação de variáveis do programa

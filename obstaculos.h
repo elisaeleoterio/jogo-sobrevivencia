@@ -19,9 +19,10 @@ void movimenta_lista_obstaculos(struct obstacle *raiz, ALLEGRO_KEYBOARD_STATE ke
 void desenha_lista_obstaculos(struct obstacle *raiz);
 void salva_pos_anterior_lista(struct obstacle *raiz);
 void reverte_pos_lista(struct obstacle *raiz);
+void desenha_lista_obst(struct obstacle *raiz);
 
 bool verifica_colisao_obs_eixo_x(struct hitbox *player, struct obstacle *lista_obstaculos, float *back_x, float old_back_x, ALLEGRO_KEYBOARD_STATE key);
-bool verifica_colisao_obs_eixo_y(struct hitbox *player, struct obstacle *lista_obstaculos);
+void verifica_colisao_obs_eixo_y(struct hitbox *player, struct obstacle *lista_obstaculos);
 bool colide_obs(struct hitbox *a, struct obstacle *b);
 
 void atualiza_lista_buracos(struct obstacle *raiz);

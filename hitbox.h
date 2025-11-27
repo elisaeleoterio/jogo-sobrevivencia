@@ -15,7 +15,7 @@ enum {
     L_BURACO,
     L_NUVEM_MOVEL,
     L_PRENSA,
-    L_ROLAMENTOS,
+    L_TEMPESTADE,
     NUM_LISTAS
 };
 
@@ -27,7 +27,7 @@ enum {
     T_ANIMAL,
     T_BURACO,
     T_NUVEM_MOVEL,
-    T_PRENSA,
+    T_TEMPESTADE,
     T_ROLAMENTOS,
 };
 
@@ -68,20 +68,17 @@ typedef struct hitbox {
 
 } hitbox;
 
-
-
 // Funções para tratar hitboxes normais
 struct hitbox *cria_hitbox(float x, float y, float w, float h, float speed_x, ALLEGRO_BITMAP *sprite, int tipo);
 
 void configura_player(struct hitbox *hit, float speed_y, float forca_pulo);
 void configura_animal(struct hitbox *obs, float distancia, float velocidade_propria);
-void configura_buraco(struct hitbox *obs, int intervalo);
+void configura_buraco(struct hitbox *obs, int intervalo, bool active);
 void configura_nuvem_movel(struct hitbox *obs, float distancia_altura, float velocidade);
 
 int verifica_colisao(struct hitbox *a, struct hitbox *b);
 void movimenta_hitbox(struct hitbox *a, ALLEGRO_KEYBOARD_STATE key);
-void desenha_hitbox(struct hitbox *a, float dest_x, float dest_y, 
-                    float larg_final, float alt_final, int flag);
+void desenha_hitbox(struct hitbox *a);
 void destruir_hitbox(struct hitbox *a);
 
 

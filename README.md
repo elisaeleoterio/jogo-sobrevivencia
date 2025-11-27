@@ -98,17 +98,17 @@ combate.
 
 # TODO Obrigatório
 [ ] 3 Obstáculos
-    [x] Espinho (nuvem com raio)
+    [x] Tempestade (nuvem em cima)
     [x] Animal que se move
-    [x] Plataforma móvel que mata ao encostar (prensa)
-    [ ] Nuvem que aparece e desaparece (usar buraco)
-    [ ] Plataforma que caí quando o player sobe
+    [x] Prensa
+    [x] Nuvem que aparece e desaparece (usar buraco)
+    [x] Espinhos
     [ ] Raios verticais
+    [x] Nuvem que tem que passar por baixo
 [x] Movimentação de abaixar
 [x] Tela de Game Over
 [x] Tela de Fim (sucesso)
 [ ] Mudar sprites de tudo
-    [ ] Arrumar sprite de fundo
     [ ] Player
     [x] Fundo
     [ ] Obstáculos
@@ -118,3 +118,13 @@ combate.
 [x] Sistema de vida (deixar sprites visíveis)
 [x] Organizar código
 [x] Mudar fontes
+[ ] Pegar sprite Tempestade
+[ ] Sprite Animal
+[ ] Sprite Prensa
+
+## FIX
+[ ] Só está voando para a direita
+[ ] Colisão lateral não está muito boa
+[ ] Trava ao colidir com animal
+[ ] Está travando na tela 5000 e poucos
+[ ] Arrumar sprite de fundo

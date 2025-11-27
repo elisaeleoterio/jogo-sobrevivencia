@@ -73,19 +73,6 @@ void movimenta_lista_obstaculos(struct obstacle *raiz, ALLEGRO_KEYBOARD_STATE ke
     }
 }
 
-// REVER LÓGICA
-void desenha_lista_obstaculos(struct obstacle *raiz) {
-    if (!raiz) {
-        return;
-    }
-
-    struct obstacle *atual = raiz;
-    while (atual != NULL) {
-        desenha_hitbox(atual->hitbox, 0, 0, atual->hitbox->width, atual->hitbox->height, 0);
-        atual = atual->next;
-    }
-}
-
 void salva_pos_anterior_lista(struct obstacle *raiz) {
     if (!raiz) {
         return;
@@ -127,6 +114,25 @@ void reverte_pos_lista(struct obstacle *raiz) {
     }
 }
 
+void desenha_lista_obst(struct obstacle *raiz) {
+    if (!raiz) {
+        return;
+    }
+    
+    struct obstacle *atual = raiz;
+    while (atual) {
+        struct hitbox *hit = atual->hitbox;
+        if (hit->tipo == T_BURACO && hit->active) {
+            atual = atual->next;
+            continue;
+        }
+        
+        desenha_hitbox(hit);
+        atual = atual->next;
+    }
+
+}
+
 // Verifica colisão no eixo x para os obstáculos
 // Retorna true se o mundo parou e false se o mundo continua
 bool verifica_colisao_obs_eixo_x(struct hitbox *player, struct obstacle *lista_obstaculos, float *back_x, float old_back_x, ALLEGRO_KEYBOARD_STATE key) {
@@ -146,8 +152,8 @@ bool verifica_colisao_obs_eixo_x(struct hitbox *player, struct obstacle *lista_o
         struct hitbox *obstacle = atual->hitbox;
         
         if (verifica_colisao(player, obstacle)) {
-            // Se for um buraco, ignora colisão lateral
-            if (obstacle->tipo == T_BURACO) {
+            // Se for um buraco e estiver desativado, ignora colisão lateral
+            if (obstacle->tipo == T_BURACO && !obstacle->active) {
                 atual = atual->next;
                 continue;
             }
@@ -185,25 +191,22 @@ bool verifica_colisao_obs_eixo_x(struct hitbox *player, struct obstacle *lista_o
     return parou;
 }
 
-bool verifica_colisao_obs_eixo_y(struct hitbox *player, struct obstacle *lista_obstaculos) {
+void verifica_colisao_obs_eixo_y(struct hitbox *player, struct obstacle *lista_obstaculos) {
     if (!player) {
         matar_pont_nulo();
     }
     
     if (!lista_obstaculos) {
-        return false;
+        return;
     }
-
-    bool in_hole = false;
     
     struct obstacle *atual = lista_obstaculos;
     while (atual != NULL) {
         struct hitbox *obstacle = atual->hitbox;
         if (verifica_colisao(player, obstacle)) {
-            if (atual->hitbox->tipo == T_BURACO) {
-                if (atual->hitbox->active){
-                    in_hole = true;
-                }
+            if (atual->hitbox->tipo == T_BURACO && !atual->hitbox->active) {
+                atual = atual->next;
+                continue;
             } else {
                 // jogador caindo
                 if (player->speed_y > 0) { 
@@ -217,19 +220,6 @@ bool verifica_colisao_obs_eixo_y(struct hitbox *player, struct obstacle *lista_o
                 }
             }
         }
-        atual = atual->next;
-    }
-    return in_hole;
-}
-
-void atualiza_lista_animais(struct obstacle *raiz) {
-    if (!raiz) {
-        return;
-    }
-    
-    struct obstacle *atual = raiz;
-    while (atual != NULL) {
-        atualiza_animal(atual->hitbox);
         atual = atual->next;
     }
 }
@@ -246,9 +236,21 @@ void atualiza_lista_buracos(struct obstacle *raiz) {
         obs->timer++;
         if (obs->timer >= obs->interval) {
                 obs->timer = 0;
-                // Alterna entre aberto (true) e fechado (false)
+                // Alterna entre aberto (false) e fechado (true)
                 obs->active = !obs->active; 
         }
+        atual = atual->next;
+    }
+}
+
+void atualiza_lista_animais(struct obstacle *raiz) {
+    if (!raiz) {
+        return;
+    }
+    
+    struct obstacle *atual = raiz;
+    while (atual != NULL) {
+        atualiza_animal(atual->hitbox);
         atual = atual->next;
     }
 }

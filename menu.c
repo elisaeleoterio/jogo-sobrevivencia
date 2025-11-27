@@ -42,7 +42,7 @@ int screen(struct mundo *mundo, char *title, char *subtitle, char *button1, char
     if (!font_subtitle) {
         al_destroy_bitmap(background);
         al_destroy_bitmap(mouse_cursor);
-        al_destroy_font(title);
+        al_destroy_font(font_title);
         matarProgramaErro(4);
     }
     
@@ -50,8 +50,8 @@ int screen(struct mundo *mundo, char *title, char *subtitle, char *button1, char
     if (!font_button) {
         al_destroy_bitmap(background);
         al_destroy_bitmap(mouse_cursor);
-        al_destroy_font(title);
-        al_destroy_font(subtitle);
+        al_destroy_font(font_title);
+        al_destroy_font(font_subtitle);
         matarProgramaErro(4);
     }
 

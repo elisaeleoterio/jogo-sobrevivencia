@@ -107,47 +107,57 @@ int fase_zero(struct mundo *mundo) {
 
         // nuvens simples (jogador pegar o jeito)
         adicionar_obstaculo(&obstaculos[L_NUVEM], cria_hitbox(450, chao_y - 50, 150, 50, -velocidade, nuvem1, T_NUVEM));
-        adicionar_obstaculo(&obstaculos[L_NUVEM], cria_hitbox(700, chao_y - 100, 150, 50, -velocidade, nuvem1, T_NUVEM));
+        adicionar_obstaculo(&obstaculos[L_NUVEM], cria_hitbox(700, chao_y - 100, 150, 50, -velocidade, nuvem2, T_NUVEM));
         adicionar_obstaculo(&obstaculos[L_NUVEM], cria_hitbox(950, chao_y - 50, 150, 50, -velocidade, nuvem1, T_NUVEM));
         
         // Plataforma com espinho encima
-        adicionar_obstaculo(&obstaculos[L_NUVEM], cria_hitbox(1200, chao_y, 800, 50, -velocidade, NULL, T_NUVEM));
-        adicionar_obstaculo(&obstaculos[L_ESPINHO], cria_hitbox(1400, chao_y - player->height / 2 - player->height, 500, player->height / 2 + 10, -velocidade, NULL, T_ESPINHO));
+        adicionar_obstaculo(&obstaculos[L_NUVEM], cria_hitbox(1200, chao_y, 800, 50, -velocidade, nuvem2, T_NUVEM));
+        adicionar_obstaculo(&obstaculos[L_TEMPESTADE], cria_hitbox(1400, chao_y - player->height / 2 - player->height, 500, player->height / 2 + 10, -velocidade, NULL, T_TEMPESTADE));
 
-        adicionar_obstaculo(&obstaculos[L_NUVEM], cria_hitbox(2100, chao_y - 50, 100, 50, -velocidade, NULL, T_NUVEM));
+        adicionar_obstaculo(&obstaculos[L_NUVEM], cria_hitbox(2100, chao_y - 50, 100, 50, -velocidade, nuvem2, T_NUVEM));
 
         // plataforma com um animal
-        adicionar_obstaculo(&obstaculos[L_NUVEM], cria_hitbox(2300, chao_y - 250, 500, 50, -velocidade, NULL, T_NUVEM));
+        adicionar_obstaculo(&obstaculos[L_NUVEM], cria_hitbox(2300, chao_y - 250, 500, 50, -velocidade, nuvem2, T_NUVEM));
         struct hitbox *inimigo = cria_hitbox(2400, chao_y - 300, 50, 50, -velocidade, NULL, T_ANIMAL);
         configura_animal(inimigo, 300, 6); // Patrulha 300px
         adicionar_obstaculo(&obstaculos[L_ANIMAL], inimigo);
 
         // Plataforma longa com prensa
-        adicionar_obstaculo(&obstaculos[L_NUVEM], cria_hitbox(2900, chao_y - 325, 700, 50, -velocidade, NULL, T_NUVEM));
+        adicionar_obstaculo(&obstaculos[L_NUVEM], cria_hitbox(3100, chao_y - 325, 1000, 50, -velocidade, nuvem2, T_NUVEM));
         // jogador precisa esperar a prensa subir para passar
-        struct hitbox *prensa1 = cria_hitbox(3000, chao_y - 850, 150, 300, -velocidade, NULL, T_NUVEM_MOVEL);
-        configura_nuvem_movel(prensa1, 250, 8); // Sobe 250 pixels
+        struct hitbox *prensa1 = cria_hitbox(3200, chao_y - 850, 150, 300, -velocidade, NULL, T_NUVEM_MOVEL);
+        configura_nuvem_movel(prensa1, 250, 7); // Sobe 250 pixels
         adicionar_obstaculo(&obstaculos[L_NUVEM_MOVEL], prensa1);
-        struct hitbox *prensa2 = cria_hitbox(3200, chao_y - 850, 150, 300, -velocidade, NULL, T_NUVEM_MOVEL);
-        configura_nuvem_movel(prensa2, 250, 7); // Sobe 250 pixels
+        struct hitbox *prensa2 = cria_hitbox(3500, chao_y - 850, 150, 300, -velocidade, NULL, T_NUVEM_MOVEL);
+        configura_nuvem_movel(prensa2, 250, 6); // Sobe 250 pixels
         adicionar_obstaculo(&obstaculos[L_NUVEM_MOVEL], prensa2);
-        struct hitbox *prensa3 = cria_hitbox(3400, chao_y - 850, 150, 300, -velocidade, NULL, T_NUVEM_MOVEL);
-        configura_nuvem_movel(prensa3, 250, 8); // Sobe 250 pixels
+        struct hitbox *prensa3 = cria_hitbox(3800, chao_y - 850, 150, 300, -velocidade, NULL, T_NUVEM_MOVEL);
+        configura_nuvem_movel(prensa3, 250, 7); // Sobe 250 pixels
         adicionar_obstaculo(&obstaculos[L_NUVEM_MOVEL], prensa3);
         
+        // Nuvens que desaparecem (fica translúcido)
+        struct hitbox *buraco1 = cria_hitbox(4200, chao_y - 100, 150, 50, -velocidade, nuvem1, T_BURACO);
+        configura_buraco(buraco1, 180, true);
+        adicionar_obstaculo(&obstaculos[L_BURACO], buraco1);
+        struct hitbox *buraco2 = cria_hitbox(4250, chao_y - 150, 150, 50, -velocidade, nuvem1, T_BURACO);
+        configura_buraco(buraco2, 180, false);
+        adicionar_obstaculo(&obstaculos[L_BURACO], buraco2);
+        struct hitbox *buraco3 = cria_hitbox(4500, chao_y - 100, 150, 50, -velocidade, nuvem2, T_BURACO);
+        configura_buraco(buraco3, 180, true);
+        adicionar_obstaculo(&obstaculos[L_BURACO], buraco3);
+        struct hitbox *buraco4 = cria_hitbox(4750, chao_y - 125, 150, 50, -velocidade, nuvem1, T_BURACO);
+        configura_buraco(buraco4, 180, false);
+        adicionar_obstaculo(&obstaculos[L_BURACO], buraco4);
+        struct hitbox *buraco5 = cria_hitbox(4900, chao_y - 150, 150, 50, -velocidade, nuvem2, T_BURACO);
+        configura_buraco(buraco5, 180, true);
+        adicionar_obstaculo(&obstaculos[L_BURACO], buraco5);
 
-
-        adicionar_obstaculo(&obstaculos[L_NUVEM], cria_hitbox(3000, chao_y - 100, 150, 50, -velocidade, NULL, T_NUVEM));
-        
-        adicionar_obstaculo(&obstaculos[L_ESPINHO], cria_hitbox(3200, chao_y - 50, 50, 50, -velocidade, NULL, T_ESPINHO));
-        
-        adicionar_obstaculo(&obstaculos[L_NUVEM], cria_hitbox(3300, chao_y, 150, 50, -velocidade, NULL, T_NUVEM));
-
-        adicionar_obstaculo(&obstaculos[L_NUVEM], cria_hitbox(3600, chao_y - 50, 100, 50, -velocidade, NULL, T_NUVEM));
-        adicionar_obstaculo(&obstaculos[L_NUVEM], cria_hitbox(3800, chao_y - 100, 100, 50, -velocidade, NULL, T_NUVEM));
-        adicionar_obstaculo(&obstaculos[L_NUVEM], cria_hitbox(4000, chao_y - 150, 100, 50, -velocidade, NULL, T_NUVEM));
-        
-        adicionar_obstaculo(&obstaculos[L_NUVEM], cria_hitbox(4200, chao_y - 50, 600, 50, -velocidade, NULL, T_NUVEM));
+        adicionar_obstaculo(&obstaculos[L_NUVEM], cria_hitbox(5100, chao_y - 100, 150, 50, -velocidade, nuvem2, T_NUVEM));
+        adicionar_obstaculo(&obstaculos[L_ESPINHO], cria_hitbox(5200, chao_y - 20, 250, 20, -velocidade, espinho1, T_ESPINHO));
+        // adicionar_obstaculo(&obstaculos[L_NUVEM], cria_hitbox(5500, chao_y, 150, 50, -velocidade, NULL, T_NUVEM));
+        adicionar_obstaculo(&obstaculos[L_NUVEM], cria_hitbox(5700, chao_y - 50, 300, 50, -velocidade, nuvem1, T_NUVEM));
+        adicionar_obstaculo(&obstaculos[L_ESPINHO], cria_hitbox(5900, chao_y - 20, 250, 20, -velocidade, espinho2, T_ESPINHO));
+        adicionar_obstaculo(&obstaculos[L_NUVEM], cria_hitbox(6000, chao_y - 100, 100, 50, -velocidade, nuvem2, T_NUVEM));
     
         float back_x = 0;
 
@@ -174,7 +184,7 @@ int fase_zero(struct mundo *mundo) {
     
                     // Movimentar no Eixo X:                
                     movimenta_hitbox(player, key);
-                    for (size_t i = 0; i < NUM_LISTAS; i++) {
+                    for (int i = 0; i < NUM_LISTAS; i++) {
                         movimenta_lista_obstaculos(obstaculos[i], key);
                     }
                     movimenta_background(&back_x, velocidade, key);
@@ -186,19 +196,20 @@ int fase_zero(struct mundo *mundo) {
     
                     // Verifica colisão no eixo x -> Antes da atuação da gravidade
                     bool mundo_parou = false;
-                    for (size_t i = 0; i < NUM_LISTAS; i++) {
+                    for (int i = 0; i < NUM_LISTAS; i++) {
                         if (verifica_colisao_obs_eixo_x(player, obstaculos[i], &back_x, old_back_x, key)) {
                             mundo_parou = true;
                         }
                     }
 
                     if (mundo_parou) {
-                        for (size_t i = 0; i < NUM_LISTAS; i++) {
+                        for (int i = 0; i < NUM_LISTAS; i++) {
                             reverte_pos_lista(obstaculos[i]);
                         }
                     }
                     
-                    if (colide_obs(player, obstaculos[L_ESPINHO]) || colide_obs(player, obstaculos[L_NUVEM_MOVEL]) || colide_obs(player, obstaculos[L_ANIMAL])) {
+                    if (colide_obs(player, obstaculos[L_ESPINHO]) || colide_obs(player, obstaculos[L_NUVEM_MOVEL]) 
+                    || colide_obs(player, obstaculos[L_ANIMAL]) || colide_obs(player, obstaculos[L_TEMPESTADE])) {
                         player->life --;
                         tentativa_done = true;
                     }
@@ -211,9 +222,8 @@ int fase_zero(struct mundo *mundo) {
                     player->y += player->speed_y;
 
 
-                    bool in_hole = false;
-                    for (size_t i = 0; i < NUM_LISTAS; i++) {
-                        in_hole = verifica_colisao_obs_eixo_y(player, obstaculos[i]);
+                    for (int i = 0; i < NUM_LISTAS; i++) {
+                        verifica_colisao_obs_eixo_y(player, obstaculos[i]);
                     }
 
                     // Se cair muito (caiu no buraco e passou do ecrã), morre
@@ -222,7 +232,7 @@ int fase_zero(struct mundo *mundo) {
                         tentativa_done = true;
                     }
                     
-                    for (size_t i = 0; i < NUM_LISTAS; i++) {
+                    for (int i = 0; i < NUM_LISTAS; i++) {
                         salva_pos_anterior_lista(obstaculos[i]);
                     }
     
@@ -247,8 +257,6 @@ int fase_zero(struct mundo *mundo) {
             if (redraw && al_event_queue_is_empty(mundo->fila_eventos)) {
                 
                 al_clear_to_color(al_map_rgb(0, 0, 0));
-
-                ALLEGRO_COLOR ceu = al_map_rgb(155, 106, 207); 
                 
                 int bg_w = al_get_bitmap_width(background);
                 int bg_h = al_get_bitmap_height(background);
@@ -263,37 +271,9 @@ int fase_zero(struct mundo *mundo) {
                 // Meu player (temp)
                 al_draw_filled_rectangle(player->x, player->y, player->x + player->width, player->y + player->height, al_map_rgb(255, 0, 0));
     
-                // Desenha obstáculos de teste
-                struct obstacle *atual = obstaculos[L_NUVEM];
-                while (atual != NULL) {
-                    al_draw_filled_rectangle(atual->hitbox->x, atual->hitbox->y, atual->hitbox->x + atual->hitbox->width, atual->hitbox->y + atual->hitbox->height, al_map_rgb(0, 0, 255));
-                    atual = atual->next;              
-                }
-    
-                atual = obstaculos[L_ESPINHO];
-                while (atual != NULL) {
-                    al_draw_filled_rectangle(atual->hitbox->x, atual->hitbox->y, atual->hitbox->x + atual->hitbox->width, atual->hitbox->y + atual->hitbox->height, al_map_rgb(255, 0, 0));
-                    atual = atual->next;              
-                }
-    
-                atual = obstaculos[L_ANIMAL];
-                while (atual != NULL) {
-                    al_draw_filled_rectangle(atual->hitbox->x, atual->hitbox->y, atual->hitbox->x + atual->hitbox->width, atual->hitbox->y + atual->hitbox->height, al_map_rgb(0, 255, 0));
-                    atual = atual->next;              
-                }
-
-                atual = obstaculos[L_BURACO];
-                while (atual != NULL) {
-                    if (atual->hitbox->active) {
-                        al_draw_filled_rectangle(atual->hitbox->x, atual->hitbox->y, atual->hitbox->x + atual->hitbox->width, atual->hitbox->y + atual->hitbox->height, al_map_rgb(30, 0, 0));
-                    }
-                    atual = atual->next;              
-                }
-
-                atual = obstaculos[L_NUVEM_MOVEL];
-                while (atual != NULL) {
-                    al_draw_filled_rectangle(atual->hitbox->x, atual->hitbox->y, atual->hitbox->x + atual->hitbox->width, atual->hitbox->y + atual->hitbox->height, al_map_rgb(55, 6, 0));
-                    atual = atual->next;              
+                // Desenha todos os obstáculos na tela
+                for (int i = 0; i < NUM_LISTAS; i++) {
+                    desenha_lista_obst(obstaculos[i]);
                 }
                 
                 // barra de voo
@@ -314,7 +294,7 @@ int fase_zero(struct mundo *mundo) {
                 float start_x = 20.0;
                 float start_y = 80.0; // Logo abaixo da barra de voo
 
-                for (size_t i = 0; i < player->life; i++) {
+                for (int i = 0; i < player->life; i++) {
                     al_draw_tinted_scaled_bitmap(vida, cor_jet, 0, 0, vida_w, vida_h, start_x + (tamanho_icone + espacamento) * i, start_y, tamanho_icone, tamanho_icone, 0);
                 }
                 al_draw_text(font, cor_jet, start_x + (tamanho_icone + espacamento) * (player->life + 1), start_y - 20, ALLEGRO_ALIGN_CENTER, "Vida");
@@ -325,7 +305,7 @@ int fase_zero(struct mundo *mundo) {
         }
 
         // Limpeza dos obstáculos da tentaiva
-        for (size_t i = 0; i < NUM_LISTAS; i++) {
+        for (int i = 0; i < NUM_LISTAS; i++) {
             destruir_lista_obstaculos(obstaculos[i]);
             obstaculos[i] = NULL;
         }

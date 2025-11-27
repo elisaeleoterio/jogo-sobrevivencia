@@ -44,7 +44,7 @@ int main() {
                 int resultado = fase_zero(mundo);
                 
                 // 1 = Vitória
-                if (resultado == 1) {
+                if (resultado == 0) {
                     int end_option = screen(mundo, "Parabéns!", "Missão cumprida!", "Restart", "Exit");
                     
                     if (end_option == 2) { // Exit
@@ -54,7 +54,7 @@ int main() {
                     // Se end_option == 1 (Restart), o loop while(fase_rodando) continua e chama fase_zero novamente
                 } 
                 // 0 = Derrota (Game Over)
-                else if (resultado == 0) {
+                else if (resultado == 1) {
                     int end_option = screen(mundo, "Game Over", "Tente novamente!", "Restart", "Exit");
                     
                     if (end_option == 2) { // Exit

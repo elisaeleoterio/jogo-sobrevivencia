@@ -58,12 +58,12 @@ void configura_animal(struct hitbox *obs, float distancia, float velocidade_prop
     obs->mov_speed = 1; // Começa indo para a direita
 }
 
-void configura_buraco(struct hitbox *obs, int intervalo) {
+void configura_buraco(struct hitbox *obs, int intervalo, bool active) {
     if (!obs) {
         matar_pont_nulo();
     }
 
-    obs->active = true; // Começa aberto
+    obs->active = active;
     obs->timer = 0;
     obs->interval = intervalo;
 }
@@ -127,7 +127,7 @@ void movimenta_hitbox(struct hitbox *a, ALLEGRO_KEYBOARD_STATE key) {
         }
         a->steps--;  
     }
-    bool agachado = false;
+    // bool agachado = false;
     if (al_key_down(&key, ALLEGRO_KEY_DOWN) && a->chao) {
         // Só agacha se estiver no chão
         // Se ainda está em pé, agacha
@@ -137,7 +137,7 @@ void movimenta_hitbox(struct hitbox *a, ALLEGRO_KEYBOARD_STATE key) {
             a->y += (a->def_height - metade_altura); 
             a->height = metade_altura;
         }
-        agachado = true;
+        // agachado = true;
     } else {
         // LEVANTAR
         // Se soltou a tecla e está agachado (altura menor que o padrão)
@@ -145,7 +145,7 @@ void movimenta_hitbox(struct hitbox *a, ALLEGRO_KEYBOARD_STATE key) {
             // Ajusta o Y para crescer
             a->y -= (a->def_height - a->height);
             a->height = a->def_height;
-            agachado = false;
+            // agachado = false;
         }
     }
     if (al_key_down(&key, ALLEGRO_KEY_UP) && a->chao) {
@@ -157,7 +157,6 @@ void movimenta_hitbox(struct hitbox *a, ALLEGRO_KEYBOARD_STATE key) {
         a->fly_timer--;
         a->chao = false;
     }
-
     // Recarregar combustível se estiver no chão
     if (a->chao && a->fly_timer < a->max_fly) {
         a->fly_timer += 0.1;
@@ -167,7 +166,7 @@ void movimenta_hitbox(struct hitbox *a, ALLEGRO_KEYBOARD_STATE key) {
     }
 }
 
-void desenha_hitbox(struct hitbox *a, float dest_x, float dest_y, float larg_final, float alt_final, int flag) {
+void desenha_hitbox(struct hitbox *a) {
     if (!a) {
         matar_pont_nulo();
     }
@@ -175,19 +174,26 @@ void desenha_hitbox(struct hitbox *a, float dest_x, float dest_y, float larg_fin
     if (!a->sprite) {
         return;
     }
-    
-    al_draw_scaled_bitmap(a->sprite, a->x, a->y, a->width, a->height, dest_x, dest_y, larg_final, alt_final, flag);
+
+    // offset_topo: "sobe" visualmente.
+    float offset_topo = 35.0; 
+    float offset_base = 10.0;  // Estende a imagem um pouco para baixo
+
+    // ajuste_lateral: Controla a largura visual
+    //   > 0 (Positivo): Alarga a imagem (borda extra)
+    //   < 0 (Negativo): Estreita a imagem (encolhe visualmente)
+    //   = 0 (Zero): Largura exata da hitbox
+    float ajuste_lateral = -30.0; // Deixa 5 pixels mais estreito de cada lado
+
+    // O Sprite deve ser desenhado da origem dele (0,0) até sua largura/altura total
+    // E ser colocado na posição de destino (dest_x, dest_y)
+    al_draw_scaled_bitmap(a->sprite, 0, 0, al_get_bitmap_width(a->sprite), al_get_bitmap_height(a->sprite), a->x - ajuste_lateral, a->y - offset_topo, a->width + ajuste_lateral * 2, a->height + offset_topo + offset_base, 0);
 }
 
 void destruir_hitbox(struct hitbox *a) {
     if (!a) {
         matar_pont_nulo();
     }
-
-    if (a->sprite) {
-        al_destroy_bitmap(a->sprite);
-    }
-
     free(a);
 }
 

@@ -8,7 +8,7 @@ LDLIBS = $(shell pkg-config --libs $(PKGS)) -lm
 
 
 # Lista de arquivos fonte
-SRC = main.c fase_zero.c erros.c inicio.c hitbox.c menu.c obstaculos.c
+SRC = main.c fase_zero.c erros.c inicio.c hitbox.c screens.c obstaculos.c
 
 # Lista de arquivos objetos
 OBJS = $(SRC:.c=.o)
@@ -34,7 +34,7 @@ fase_zero.o: fase_zero.h fase_zero.c
 erros.o: erros.h erros.c
 inicio.o: inicio.h inicio.c
 hitbox.o: hitbox.h hitbox.c
-menu.o: menu.h menu.c
+screens.o: screens.h screens.c
 obstaculos.o = obstaculos.h obstaculos.c
 
 clean:

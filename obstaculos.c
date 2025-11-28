@@ -163,7 +163,6 @@ bool verifica_colisao_obs_eixo_x(struct hitbox *player, struct obstacle *lista_o
             if (!x_sobrepor) {
                 // Veio da esquerda
                 if (player->old_x + player->width <= obstacle->old_x + TOLERANCIA) {
-                    // Se está indo para a direita, para o mundo
                     if (al_key_down(&key, ALLEGRO_KEY_RIGHT) && !parou) {
                         reverte_pos_lista(lista_obstaculos);
                         *back_x = old_back_x;
@@ -234,7 +233,7 @@ void atualiza_lista_buracos(struct obstacle *raiz) {
         obs->timer++;
         if (obs->timer >= obs->interval) {
                 obs->timer = 0;
-                // Alterna entre aberto (false) e fechado (true)
+                // Alterna entre desativado (false) e ativado (true)
                 obs->active = !obs->active; 
         }
         atual = atual->next;

@@ -17,7 +17,7 @@ enum {
     L_PRENSA,
     L_TEMPESTADE,
     L_FIM,
-    NUM_LISTAS
+    NUM_LISTAS,
 };
 
 // Enumeração dos tipos de hitboxes
@@ -32,15 +32,15 @@ enum {
     T_FIM,
 };
 
-// Enumeração dos Estados do Player (Sprites) ---
+// Enumeração dos Estados do Player (Sprites)
 enum {
-    OBSTACULOS, // Para armazenar sprites normais dos obstáculos
-    S_IDLE,   // Parado
-    S_WALK,   // Andando
-    S_JUMP,   // Pulando    
-    S_FLY,    // Voando
-    S_CROUCH, // Abaixado
-    NUM_STATES // Total de estados
+    OBSTACULOS,
+    S_IDLE,
+    S_WALK,
+    S_JUMP,  
+    S_FLY,
+    S_CROUCH,
+    NUM_STATES
 };
 
 typedef struct hitbox {
@@ -71,14 +71,11 @@ typedef struct hitbox {
     // Ação de abaixar
     float def_height;
 
-
     // NOVOS CAMPOS PARA OBTÁCULO COM MOVIMENTO AUTOMÁTICO
     float mov_speed;  // Velocidade própria do objeto (independente do player)
     float min_x, max_x;  // Limites da área de patrulha
     float old_min_x, old_max_x; 
     int mov_direcao;      // 1 (direita/cima) ou -1 (esquerda/baixo)
-    
-    // CAMPOS PARA BURACOS QUE SE MOVEM VERTICALMENTE
     float min_y, max_y;
     float old_min_y, old_max_y;
     

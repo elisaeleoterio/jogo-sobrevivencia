@@ -1,52 +1,52 @@
-## Comando para executar o jogo
->``gcc menu.c -o menu $(pkg-config --cflags --libs allegro-5 allegro_image-5 allegro_font-5)``
-> Versão utilizada: 5.2
-
-### TO-DO:
-1. Implementar fundo
-2. Como colocar sprites
-3. Definir obstáculos
-4. Menu
-    a. Aumentar fonte
-    b. Escalonar fundo
-    c. Quadrado do menu
-    d. Lógica dos botão
-5. Função modular de verificação de colisão
-6. Ver boas práticas de nomeclatura de arquivos e funções
-7. Ver como que funciona gravidade pro boneco pular
-8. Ajeitar sprites
-9. Ver como carregar obstáculos
+# TO-DO:
+[ ] Implementar fundo
+[ ] Como colocar sprites
+[ ] Definir obstáculos
+[ ] Menu
+    [ ] Aumentar fonte
+    [ ] Escalonar fundo
+    [ ] Lógica dos botão
+[ ] Função modular de verificação de colisão
+[ ] Ver como que funciona gravidade pro boneco pular
+[ ] Ajeitar sprites
+[ ] Ver como carregar obstáculos
     - Tem que aparecer ao poucos, quando o jogador estiver no passo x
-10. Criar movimentação abaixado
+[ ] Criar movimentação abaixado
+[ ] 3 Obstáculos
+    [x] Tempestade (nuvem em cima)
+    [x] Animal que se move
+    [x] Prensa
+    [x] Nuvem que aparece e desaparece (usar buraco)
+    [x] Espinhos
+    [ ] Raios verticais
+    [x] Nuvem que tem que passar por baixo
+[x] Movimentação de abaixar
+[x] Tela de Game Over
+[x] Tela de Fim (sucesso)
+[x] Mudar sprites de tudo
+    [x] Player
+    [x] Fundo
+    [x] Obstáculos
+[x] Colocar estrela de fim
+[ ] Textinho inicial de história
+[x] Player voar
+[x] Sistema de vida (deixar sprites visíveis)
+[x] Organizar código
+[x] Mudar fontes
+[x] Pegar sprite Tempestade
+[x] Sprite Animal
+[x] Sprite Prensa
 
-
-### FUNCIONALIDADES EXTRAS:
-20 pts, Implementar uma segunda fase, com background diferente e um
-conjunto inédito de obstáculos.
-
-### Allegro Addons:
-
-allegro_image -> allegro
-allegro_primitives -> allegro
-allegro_color -> allegro
-
-allegro_font -> allegro
-allegro_ttf -> allegro_font -> allegro
-
-allegro_audio -> allegro
-allegro_acodec -> allegro_audio -> allegro
-allegro_video -> allegro_audio -> allegro
-
-allegro_memfile -> allegro
-allegro_physfs -> allegro
-
-allegro_native_dialog -> allegro
-
-### ERROS
-- Não está verificando corretamente a colisão com um obstáculo
-
-
-
+# FUNCIONALIDADES EXTRAS:
+[x][7],10 pts, Implementar um sistema de Stamina/Fôlego (o jogador ""cansa""
+ao correr ou ao se balançar e deve se recuperar)
+[x][3],5 pts,Implementar um botão de pausa para a fase.
+[x][4],10 pts, Implementar a função de ""rastejar"" (movimentar-se abaixado)
+para passar por áreas baixas.
+[x][2],15 pts, Implementar, pelo menos, um segundo tipo de obstáculo dinâmico
+inédito, diferente dos requisitos mínimos (ex: plataformas que caem ou
+desmoronam)
+[ ][11],5 pts, Item coletável que aumenta a barra de vida.
 
 # REQUISITOS MÍNIMOS
 
@@ -75,56 +75,26 @@ movimenta).
 - Ataque (dano) é causado por contato/colisão, não por projéteis ou
 combate.
 
+## Fase
+- Pelo menos uma fase completa;
+- Pelo menos 6 elementos de perigo/armadilhas espalhados pela fase.
+
 ### Obstáculos Fase 0
 [x] Espinhos
 [x] Animal que se move dentro de limite horizontal
 [x] Buraco no chão fixo
 [x] Plataforma que se move verticalmente
 [x] Plataforma que caí (fazer nuvens que despencam) // Seguir a lógica do buraco
-[ ] Obstáculo que "caí" pela tela vertical
-[ ] Obstáculo que "caí" pela tela horizontal
-
 [x] Buraco no chão que surge a cada peŕiodo de tempo (não conta como obstáculo diferente)
-[x] Plataforma (não é obstáculo)
-### Obstáculos Fase 1
-[ ] Plataforma superior (player precisa se abaixar)
-[ ] Prensas Hidráulicas
-[ ] Plataformas que mudam de "estado" -> Nuvem transparente ou sólida
+[x] Plataforma
 
-
-## Fase
-- Pelo menos uma fase completa;
-- Pelo menos 6 elementos de perigo/armadilhas espalhados pela fase.
-
-# TODO Obrigatório
-[ ] 3 Obstáculos
-    [x] Tempestade (nuvem em cima)
-    [x] Animal que se move
-    [x] Prensa
-    [x] Nuvem que aparece e desaparece (usar buraco)
-    [x] Espinhos
-    [ ] Raios verticais
-    [x] Nuvem que tem que passar por baixo
-[x] Movimentação de abaixar
-[x] Tela de Game Over
-[x] Tela de Fim (sucesso)
-[ ] Mudar sprites de tudo
-    [ ] Player
-    [x] Fundo
-    [ ] Obstáculos
-[ ] Colocar estrela de fim
-[ ] Textinho inicial de história
-[x] Player voar
-[x] Sistema de vida (deixar sprites visíveis)
-[x] Organizar código
-[x] Mudar fontes
-[ ] Pegar sprite Tempestade
-[ ] Sprite Animal
-[ ] Sprite Prensa
 
 ## FIX
-[ ] Só está voando para a direita
-[ ] Colisão lateral não está muito boa
-[ ] Trava ao colidir com animal
-[ ] Está travando na tela 5000 e poucos
-[ ] Arrumar sprite de fundo
+[x] Só está voando para a direita
+[x] Colisão lateral não está muito boa
+[x] Trava ao colidir com animal
+[x] Está travando na tela 5000 e poucos
+[x] Arrumar sprite de fundo
+[x] Arrumar saída na tela pause
+[x] Arrumar lateral da sprite do sapo
+[ ] Revisar hitbox.c

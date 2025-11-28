@@ -3,7 +3,7 @@
 #include <allegro5/allegro.h>
 
 #include "erros.h"
-#include "hitbox.h" // Incluir hitbox para saber o tamanho da struct
+#include "hitbox.h"
 
 #ifndef _OBSTACULOS_H_
 #define _OBSTACULOS_H_

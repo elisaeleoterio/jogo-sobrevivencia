@@ -10,7 +10,7 @@
 #include "erros.h"
 #include "inicio.h"
 #include "hitbox.h"
-#include "menu.h"
+#include "screens.h"
 
 int screen(struct mundo *mundo, char *title, char *subtitle, char *button1, char *button2) {
     if (!mundo) {
@@ -20,14 +20,14 @@ int screen(struct mundo *mundo, char *title, char *subtitle, char *button1, char
     // Carrega imagem de fundo do menu
     ALLEGRO_BITMAP *background = al_load_bitmap("assets/images/menu_background.jpg");
     if (!background) {
-        matarProgramaErro(4);
+        matar_falta_memoria();
     }
 
     // Carrega imagem que irá substituir o cursor do mouse
     ALLEGRO_BITMAP *mouse_cursor = al_load_bitmap("assets/images/mouse_cursor.png");
     if (!mouse_cursor) {
         al_destroy_bitmap(background);
-        matarProgramaErro(4);
+        matar_falta_memoria();
     }
 
     // Carrega a fonte que será utilizada
@@ -35,7 +35,7 @@ int screen(struct mundo *mundo, char *title, char *subtitle, char *button1, char
     if (!font_title) {
         al_destroy_bitmap(background);
         al_destroy_bitmap(mouse_cursor);
-        matarProgramaErro(4);
+        matar_falta_memoria();
     }
     
     ALLEGRO_FONT *font_subtitle = al_load_font("assets/fonts/LaBelleAurore-Regular.ttf", 35, 0);
@@ -43,7 +43,7 @@ int screen(struct mundo *mundo, char *title, char *subtitle, char *button1, char
         al_destroy_bitmap(background);
         al_destroy_bitmap(mouse_cursor);
         al_destroy_font(font_title);
-        matarProgramaErro(4);
+        matar_falta_memoria();
     }
     
     ALLEGRO_FONT *font_button = al_load_font("assets/fonts/LaBelleAurore-Regular.ttf", 50, 0);
@@ -52,12 +52,11 @@ int screen(struct mundo *mundo, char *title, char *subtitle, char *button1, char
         al_destroy_bitmap(mouse_cursor);
         al_destroy_font(font_title);
         al_destroy_font(font_subtitle);
-        matarProgramaErro(4);
+        matar_falta_memoria();
     }
 
     // Variáveis de estado do menu
     bool screen_done = false;
-    // Flag para controlar quando desenhar na tela
     bool redraw = true; 
 
     // Variáveis de estado do mouse e seleção
@@ -132,10 +131,8 @@ int screen(struct mundo *mundo, char *title, char *subtitle, char *button1, char
             // Realiza esse evento se o usuário selecionar alguma opçao do menu
             case ALLEGRO_EVENT_MOUSE_BUTTON_DOWN:
                 if (selected_option == 1) {
-                    printf("Botão 1 pressionado.\n");
                     screen_done = true;
                 } else if (selected_option == 2) {
-                    printf("Botão 2 selecionado.\n");
                     screen_done = true;
                 }
                 break;
@@ -181,8 +178,6 @@ int screen(struct mundo *mundo, char *title, char *subtitle, char *button1, char
             al_draw_scaled_bitmap(mouse_cursor, 0, 0, mouse_width, mouse_height, mouse_x, mouse_y, 
                                     mouse_width * 0.02, mouse_height * 0.02, ALLEGRO_MIN_LINEAR);     
             
-            // Copies or updates the front and back buffers so that what has been drawn 
-            // previously on the currently selected display becomes visible on screen. 
             al_flip_display();
         }
     }

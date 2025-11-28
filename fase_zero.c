@@ -10,6 +10,7 @@
 #include "erros.h"
 #include "inicio.h"
 #include "hitbox.h"
+#include "menu.h"
 #include "fase_zero.h"
 #include "obstaculos.h"
 
@@ -32,19 +33,18 @@ int fase_zero(struct mundo *mundo) {
         return 1;
     }
 
-    ALLEGRO_BITMAP *nuvem1 = al_load_bitmap("assets/images/nuvem1.png");
-    if (!nuvem1) {
+    ALLEGRO_BITMAP *nuvem = al_load_bitmap("assets/images/nuvem.png");
+    if (!nuvem) {
         al_destroy_bitmap(background);
         al_destroy_bitmap(vida);
         return 1;
     }
 
-   
-    ALLEGRO_BITMAP *nuvem2 = al_load_bitmap("assets/images/nuvem2.png");
-    if (!nuvem2) {
+    ALLEGRO_BITMAP *tempestade = al_load_bitmap("assets/images/tempestade.png");
+    if (!tempestade) {
         al_destroy_bitmap(background);
         al_destroy_bitmap(vida);
-        al_destroy_bitmap(nuvem1);
+        al_destroy_bitmap(nuvem);
         return 1;
     }
 
@@ -52,28 +52,54 @@ int fase_zero(struct mundo *mundo) {
     if (!espinho1) {
         al_destroy_bitmap(background);
         al_destroy_bitmap(vida);
-        al_destroy_bitmap(nuvem1);
-        al_destroy_bitmap(nuvem2);
+        al_destroy_bitmap(nuvem);
+        al_destroy_bitmap(tempestade);
         return 1;
     }
 
     ALLEGRO_BITMAP *espinho2 = al_load_bitmap("assets/images/espinho2.png");
-    if (!espinho1) {
+    if (!espinho2) {
         al_destroy_bitmap(background);
         al_destroy_bitmap(vida);
-        al_destroy_bitmap(nuvem1);
-        al_destroy_bitmap(nuvem2);
+        al_destroy_bitmap(nuvem);
+        al_destroy_bitmap(tempestade);
         al_destroy_bitmap(espinho1);
         return 1;
     }
 
     ALLEGRO_BITMAP *prensa = al_load_bitmap("assets/images/prensa.png");
-    if (!espinho1) {
+    if (!prensa) {
         al_destroy_bitmap(background);
         al_destroy_bitmap(vida);
-        al_destroy_bitmap(nuvem1);
-        al_destroy_bitmap(nuvem2);
+        al_destroy_bitmap(nuvem);
+        al_destroy_bitmap(tempestade);
         al_destroy_bitmap(espinho1);
+        al_destroy_bitmap(espinho2);
+        return 1;
+    }
+
+    ALLEGRO_BITMAP *animal = al_load_bitmap("assets/images/animal.png");
+    if (!animal) {
+        al_destroy_bitmap(background);
+        al_destroy_bitmap(vida);
+        al_destroy_bitmap(nuvem);
+        al_destroy_bitmap(tempestade);
+        al_destroy_bitmap(espinho1);
+        al_destroy_bitmap(espinho2);
+        al_destroy_bitmap(prensa);
+        return 1;
+    }
+
+    ALLEGRO_BITMAP *fim = al_load_bitmap("assets/images/fim.png");
+    if (!fim) {
+        al_destroy_bitmap(background);
+        al_destroy_bitmap(vida);
+        al_destroy_bitmap(nuvem);
+        al_destroy_bitmap(tempestade);
+        al_destroy_bitmap(espinho1);
+        al_destroy_bitmap(espinho2);
+        al_destroy_bitmap(prensa);
+        al_destroy_bitmap(animal);
         return 1;
     }
 
@@ -81,10 +107,13 @@ int fase_zero(struct mundo *mundo) {
     if (!font) {
         al_destroy_bitmap(background);
         al_destroy_bitmap(vida);
-        al_destroy_bitmap(nuvem1);
-        al_destroy_bitmap(nuvem2);
+        al_destroy_bitmap(nuvem);
+        al_destroy_bitmap(tempestade);
         al_destroy_bitmap(espinho1);
         al_destroy_bitmap(espinho2);
+        al_destroy_bitmap(prensa);
+        al_destroy_bitmap(animal);
+        al_destroy_bitmap(fim);
         matarProgramaErro(4);
     }
 
@@ -119,61 +148,62 @@ int fase_zero(struct mundo *mundo) {
         player->fly_timer = player->max_fly; // Começa cheio
 
         // nuvem pro jogador spwanar
-        adicionar_obstaculo(&obstaculos[L_NUVEM], cria_hitbox(50, chao_y, 300, 50, -velocidade, nuvem1, T_NUVEM));
+        adicionar_obstaculo(&obstaculos[L_NUVEM], cria_hitbox(50, chao_y, 300, 50, -velocidade, nuvem, T_NUVEM));
 
         // nuvens simples (jogador pegar o jeito)
-        adicionar_obstaculo(&obstaculos[L_NUVEM], cria_hitbox(450, chao_y - 50, 150, 50, -velocidade, nuvem1, T_NUVEM));
-        adicionar_obstaculo(&obstaculos[L_NUVEM], cria_hitbox(700, chao_y - 100, 150, 50, -velocidade, nuvem2, T_NUVEM));
-        adicionar_obstaculo(&obstaculos[L_NUVEM], cria_hitbox(950, chao_y - 50, 150, 50, -velocidade, nuvem1, T_NUVEM));
+        adicionar_obstaculo(&obstaculos[L_NUVEM], cria_hitbox(600, chao_y - 50, 150, 50, -velocidade, nuvem, T_NUVEM));
+        adicionar_obstaculo(&obstaculos[L_NUVEM], cria_hitbox(950, chao_y - 100, 150, 50, -velocidade, nuvem, T_NUVEM));
+        adicionar_obstaculo(&obstaculos[L_NUVEM], cria_hitbox(1300, chao_y - 50, 150, 50, -velocidade, nuvem, T_NUVEM));
         
         // Plataforma com espinho encima
-        adicionar_obstaculo(&obstaculos[L_NUVEM], cria_hitbox(1200, chao_y, 800, 50, -velocidade, nuvem2, T_NUVEM));
-        adicionar_obstaculo(&obstaculos[L_TEMPESTADE], cria_hitbox(1400, chao_y - player->height / 2 - player->height, 500, player->height / 2 + 10, -velocidade, espinho1, T_TEMPESTADE));
-
-        adicionar_obstaculo(&obstaculos[L_NUVEM], cria_hitbox(2100, chao_y - 50, 100, 50, -velocidade, nuvem2, T_NUVEM));
+        adicionar_obstaculo(&obstaculos[L_NUVEM], cria_hitbox(1700, chao_y, 900, 50, -velocidade, nuvem, T_NUVEM));
+        adicionar_obstaculo(&obstaculos[L_TEMPESTADE], cria_hitbox(1900, chao_y - player->height / 2 - player->height - 100, 500, player->height / 2 + 100, -velocidade, tempestade, T_TEMPESTADE));
 
         // plataforma com um animal
-        adicionar_obstaculo(&obstaculos[L_NUVEM], cria_hitbox(2300, chao_y - 250, 500, 50, -velocidade, nuvem2, T_NUVEM));
-        struct hitbox *inimigo = cria_hitbox(2400, chao_y - 300, 50, 50, -velocidade, espinho1, T_ANIMAL);
-        configura_animal(inimigo, 300, 6); // Patrulha 300px
+        adicionar_obstaculo(&obstaculos[L_NUVEM], cria_hitbox(2700, chao_y - 250, 500, 50, -velocidade, nuvem, T_NUVEM));
+        struct hitbox *inimigo = cria_hitbox(2900, chao_y - 300, 50, 50, -velocidade, animal, T_ANIMAL);
+        configura_animal(inimigo, 300, 8); // Patrulha 300px
         adicionar_obstaculo(&obstaculos[L_ANIMAL], inimigo);
 
         // Plataforma longa com prensa
-        adicionar_obstaculo(&obstaculos[L_NUVEM], cria_hitbox(3100, chao_y - 325, 1000, 50, -velocidade, nuvem1, T_NUVEM));
+        adicionar_obstaculo(&obstaculos[L_NUVEM], cria_hitbox(3400, chao_y - 325, 1500, 50, -velocidade, nuvem, T_NUVEM));
         // jogador precisa esperar a prensa subir para passar
-        struct hitbox *prensa1 = cria_hitbox(3200, chao_y - 850, 150, 300, -velocidade, prensa, T_NUVEM_MOVEL);
+        struct hitbox *prensa1 = cria_hitbox(3600, chao_y - 850, 150, 300, -velocidade, prensa, T_NUVEM_MOVEL);
         configura_nuvem_movel(prensa1, 250, 7); // Sobe 250 pixels
         adicionar_obstaculo(&obstaculos[L_NUVEM_MOVEL], prensa1);
-        struct hitbox *prensa2 = cria_hitbox(3500, chao_y - 850, 150, 300, -velocidade, prensa, T_NUVEM_MOVEL);
+        struct hitbox *prensa2 = cria_hitbox(4000, chao_y - 850, 150, 300, -velocidade, prensa, T_NUVEM_MOVEL);
         configura_nuvem_movel(prensa2, 250, 6); // Sobe 250 pixels
         adicionar_obstaculo(&obstaculos[L_NUVEM_MOVEL], prensa2);
-        struct hitbox *prensa3 = cria_hitbox(3800, chao_y - 850, 150, 300, -velocidade, prensa, T_NUVEM_MOVEL);
+        struct hitbox *prensa3 = cria_hitbox(4400, chao_y - 850, 150, 300, -velocidade, prensa, T_NUVEM_MOVEL);
         configura_nuvem_movel(prensa3, 250, 7); // Sobe 250 pixels
         adicionar_obstaculo(&obstaculos[L_NUVEM_MOVEL], prensa3);
         
         // Nuvens que desaparecem (fica translúcido)
-        struct hitbox *buraco1 = cria_hitbox(4200, chao_y - 100, 150, 50, -velocidade, nuvem1, T_BURACO);
+        struct hitbox *buraco1 = cria_hitbox(5000, chao_y - 100, 150, 50, -velocidade, nuvem, T_BURACO);
         configura_buraco(buraco1, 180, true);
         adicionar_obstaculo(&obstaculos[L_BURACO], buraco1);
-        struct hitbox *buraco2 = cria_hitbox(4250, chao_y - 150, 150, 50, -velocidade, nuvem1, T_BURACO);
+        struct hitbox *buraco2 = cria_hitbox(5200, chao_y - 150, 150, 50, -velocidade, nuvem, T_BURACO);
         configura_buraco(buraco2, 180, false);
-        adicionar_obstaculo(&obstaculos[L_BURACO], buraco2);
-        struct hitbox *buraco3 = cria_hitbox(4500, chao_y - 100, 150, 50, -velocidade, nuvem2, T_BURACO);
+        struct hitbox *buraco3 = cria_hitbox(5400, chao_y - 100, 150, 50, -velocidade, nuvem, T_BURACO);
         configura_buraco(buraco3, 180, true);
         adicionar_obstaculo(&obstaculos[L_BURACO], buraco3);
-        struct hitbox *buraco4 = cria_hitbox(4750, chao_y - 125, 150, 50, -velocidade, nuvem1, T_BURACO);
+        struct hitbox *buraco4 = cria_hitbox(5600, chao_y - 125, 150, 50, -velocidade, nuvem, T_BURACO);
         configura_buraco(buraco4, 180, false);
         adicionar_obstaculo(&obstaculos[L_BURACO], buraco4);
-        struct hitbox *buraco5 = cria_hitbox(4900, chao_y - 150, 150, 50, -velocidade, nuvem2, T_BURACO);
+        struct hitbox *buraco5 = cria_hitbox(5800, chao_y - 150, 150, 50, -velocidade, nuvem, T_BURACO);
         configura_buraco(buraco5, 180, true);
         adicionar_obstaculo(&obstaculos[L_BURACO], buraco5);
 
-        adicionar_obstaculo(&obstaculos[L_NUVEM], cria_hitbox(5100, chao_y - 100, 150, 50, -velocidade, nuvem2, T_NUVEM));
-        adicionar_obstaculo(&obstaculos[L_ESPINHO], cria_hitbox(5200, chao_y - 20, 250, 20, -velocidade, espinho1, T_ESPINHO));
-        // adicionar_obstaculo(&obstaculos[L_NUVEM], cria_hitbox(5500, chao_y, 150, 50, -velocidade, NULL, T_NUVEM));
-        adicionar_obstaculo(&obstaculos[L_NUVEM], cria_hitbox(5700, chao_y - 50, 300, 50, -velocidade, nuvem1, T_NUVEM));
-        adicionar_obstaculo(&obstaculos[L_ESPINHO], cria_hitbox(5900, chao_y - 20, 250, 20, -velocidade, espinho2, T_ESPINHO));
-        adicionar_obstaculo(&obstaculos[L_NUVEM], cria_hitbox(6000, chao_y - 100, 100, 50, -velocidade, nuvem2, T_NUVEM));
+        adicionar_obstaculo(&obstaculos[L_NUVEM], cria_hitbox(6100, chao_y - 100, 150, 50, -velocidade, nuvem, T_NUVEM));
+        adicionar_obstaculo(&obstaculos[L_ESPINHO], cria_hitbox(6400, chao_y - 50, 150, 50, -velocidade, espinho1, T_NUVEM));
+        adicionar_obstaculo(&obstaculos[L_NUVEM], cria_hitbox(6700, chao_y - 100, 100, 50, -velocidade, nuvem, T_NUVEM));
+        adicionar_obstaculo(&obstaculos[L_ESPINHO], cria_hitbox(7000, chao_y - 50, 150, 50, -velocidade, espinho1, T_NUVEM));
+
+        adicionar_obstaculo(&obstaculos[L_NUVEM], cria_hitbox(7300, chao_y - 50, 150, 50, -velocidade, nuvem, T_NUVEM));
+        adicionar_obstaculo(&obstaculos[L_NUVEM], cria_hitbox(7500, chao_y - 100, 150, 50, -velocidade, nuvem, T_NUVEM));
+        adicionar_obstaculo(&obstaculos[L_NUVEM], cria_hitbox(7700, chao_y - 50, 150, 50, -velocidade, nuvem, T_NUVEM));
+
+        adicionar_obstaculo(&obstaculos[L_FIM], cria_hitbox(7800, chao_y - 200, 70, 70, -velocidade, fim, T_FIM));
     
         float back_x = 0;
 
@@ -210,6 +240,16 @@ int fase_zero(struct mundo *mundo) {
                     atualiza_lista_nuvem_movel(obstaculos[L_NUVEM_MOVEL]);
                     atualiza_lista_buracos(obstaculos[L_BURACO]);
     
+                    if (colide_obs(player, obstaculos[L_ESPINHO]) || colide_obs(player, obstaculos[L_NUVEM_MOVEL]) 
+                    || colide_obs(player, obstaculos[L_ANIMAL]) || colide_obs(player, obstaculos[L_TEMPESTADE])) {
+                        player->life --;
+                        tentativa_done = true;
+                    }
+
+                    if (verifica_colisao(player, obstaculos[L_FIM]->hitbox)) {
+                        return 0;
+                    }
+
                     // Verifica colisão no eixo x -> Antes da atuação da gravidade
                     bool mundo_parou = false;
                     for (int i = 0; i < NUM_LISTAS; i++) {
@@ -224,11 +264,6 @@ int fase_zero(struct mundo *mundo) {
                         }
                     }
                     
-                    if (colide_obs(player, obstaculos[L_ESPINHO]) || colide_obs(player, obstaculos[L_NUVEM_MOVEL]) 
-                    || colide_obs(player, obstaculos[L_ANIMAL]) || colide_obs(player, obstaculos[L_TEMPESTADE])) {
-                        player->life --;
-                        tentativa_done = true;
-                    }
                     
                     // Gravidade e Colisão vertical
                     player->chao = false;
@@ -265,6 +300,23 @@ int fase_zero(struct mundo *mundo) {
                 case ALLEGRO_EVENT_DISPLAY_CLOSE:
                     game_done = true;
                     break;
+                case ALLEGRO_EVENT_KEY_DOWN:
+                    if (evento.keyboard.keycode == ALLEGRO_KEY_ESCAPE) {
+                        // Chama o menu de Pause
+                        // Botão 1 = Retornar | Botão 2 = Sair
+                        int selection = screen(mundo, "Pause", NULL, "Retornar", "Sair");
+                        
+                        if (selection == 1) {
+                            // Retornar: Não faz nada, o loop continua normalmente
+                        } 
+                        else if (selection == 2) {
+                            // Sair: Encerra os loops
+                            game_done = true;
+                            tentativa_done = true; 
+                            return 2; // Retorna código 2 (EXIT) para ser tratado no main
+                        }
+                    }
+                    break;
                 default:
                     break;
             }
@@ -285,8 +337,6 @@ int fase_zero(struct mundo *mundo) {
                 // TODO: Ver como colocar o fundo para o lado esquerdo
                 
                 desenha_personagem(player, 0);
-
-                // al_draw_filled_rectangle(player->x, player->y, player->x + player->width, player->y + player->height, al_map_rgb(255, 0, 0));
     
                 // Desenha todos os obstáculos na tela
                 for (int i = 0; i < NUM_LISTAS; i++) {
@@ -332,8 +382,7 @@ int fase_zero(struct mundo *mundo) {
     destruir_hitbox(player);
     al_destroy_bitmap(background);
     al_destroy_bitmap(vida);
-    al_destroy_bitmap(nuvem1);
-    al_destroy_bitmap(nuvem2);
+    al_destroy_bitmap(nuvem);
     al_destroy_bitmap(espinho1);
     al_destroy_bitmap(espinho2);
     al_destroy_font(font);

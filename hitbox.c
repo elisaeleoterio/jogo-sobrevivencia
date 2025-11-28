@@ -242,14 +242,14 @@ void desenha_hitbox(struct hitbox *a) {
     }
 
     // offset_topo: "sobe" visualmente.
-    float offset_topo = 35.0; 
+    float offset_topo = 15.0; 
     float offset_base = 10.0;  // Estende a imagem um pouco para baixo
 
     // ajuste_lateral: Controla a largura visual
     //   > 0 (Positivo): Alarga a imagem (borda extra)
     //   < 0 (Negativo): Estreita a imagem (encolhe visualmente)
     //   = 0 (Zero): Largura exata da hitbox
-    float ajuste_lateral = -30.0; // Deixa 5 pixels mais estreito de cada lado
+    float ajuste_lateral = 30.0; // Deixa 5 pixels mais estreito de cada lado
 
     // O Sprite deve ser desenhado da origem dele (0,0) até sua largura/altura total
     // E ser colocado na posição de destino (dest_x, dest_y)

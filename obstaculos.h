@@ -16,7 +16,6 @@ typedef struct obstacle {
 void adicionar_obstaculo(struct obstacle **raiz, struct hitbox *hitbox);
 void destruir_lista_obstaculos(struct obstacle *raiz);
 void movimenta_lista_obstaculos(struct obstacle *raiz, ALLEGRO_KEYBOARD_STATE key);
-void desenha_lista_obstaculos(struct obstacle *raiz);
 void salva_pos_anterior_lista(struct obstacle *raiz);
 void reverte_pos_lista(struct obstacle *raiz);
 void desenha_lista_obst(struct obstacle *raiz);

@@ -22,6 +22,7 @@ int main() {
     al_register_event_source(mundo->fila_eventos, al_get_display_event_source(mundo->display)); // Eventos da tela
     al_register_event_source(mundo->fila_eventos, al_get_timer_event_source(mundo->timer));     // Eventos do timer (FPS)
     al_register_event_source(mundo->fila_eventos, al_get_mouse_event_source());          // Eventos do mouse
+    al_register_event_source(mundo->fila_eventos, al_get_keyboard_event_source()); // Eventos do teclado
 
     // Esconde o cursor do mouse
     al_hide_mouse_cursor(mundo->display);
@@ -61,6 +62,8 @@ int main() {
                         fase = false;
                         game_done = true;
                     }
+                } else {
+                    game_done = true;
                 }
             }
             

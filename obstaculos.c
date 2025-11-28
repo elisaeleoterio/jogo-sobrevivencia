@@ -122,15 +122,13 @@ void desenha_lista_obst(struct obstacle *raiz) {
     struct obstacle *atual = raiz;
     while (atual) {
         struct hitbox *hit = atual->hitbox;
-        if (hit->tipo == T_BURACO && hit->active) {
-            atual = atual->next;
+        if (hit->tipo == T_BURACO && !hit->active) {
+            atual=atual->next;
             continue;
         }
-        
         desenha_hitbox(hit);
         atual = atual->next;
     }
-
 }
 
 // Verifica colisão no eixo x para os obstáculos

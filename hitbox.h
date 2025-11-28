@@ -31,10 +31,30 @@ enum {
     T_ROLAMENTOS,
 };
 
+// Enumeração dos Estados do Player (Sprites) ---
+enum {
+    OBSTACULOS, // Para armazenar sprites normais dos obstáculos
+    S_IDLE,   // Parado
+    S_WALK,   // Andando
+    S_JUMP,   // Pulando    
+    S_FLY,    // Voando
+    S_CROUCH, // Abaixado
+    NUM_STATES // Total de estados
+};
+
 typedef struct hitbox {
     float y, x;
     float width, height;
-    ALLEGRO_BITMAP *sprite; // Arquivo de sprite
+    
+    // Vetor de imagens (Sprite Sheets)
+    ALLEGRO_BITMAP *sprites[NUM_STATES]; 
+    int max_frames[NUM_STATES];
+    int current_frame;
+    int frame_timer;
+    int frame_delay;
+    int current_state;
+    int direction;
+
     float speed_x, speed_y; // Velocidade de locomoção
     float forca_pulo;
     float chao;
@@ -81,7 +101,9 @@ void movimenta_hitbox(struct hitbox *a, ALLEGRO_KEYBOARD_STATE key);
 void desenha_hitbox(struct hitbox *a);
 void destruir_hitbox(struct hitbox *a);
 
-
+void configura_sprites_player(struct hitbox *p, ALLEGRO_BITMAP *idle, int f_idle,  ALLEGRO_BITMAP *walk, int f_walk, ALLEGRO_BITMAP *jump, 
+                                int f_jump, ALLEGRO_BITMAP *fly, int f_fly, ALLEGRO_BITMAP *crouch, int f_crouch);
+void desenha_personagem(struct hitbox *p, int flag);
 void atualiza_animal(struct hitbox *obs);
 void atualiza_nuvem_movel(struct hitbox *obs);
 

@@ -67,6 +67,16 @@ int fase_zero(struct mundo *mundo) {
         return 1;
     }
 
+    ALLEGRO_BITMAP *prensa = al_load_bitmap("assets/images/prensa.png");
+    if (!espinho1) {
+        al_destroy_bitmap(background);
+        al_destroy_bitmap(vida);
+        al_destroy_bitmap(nuvem1);
+        al_destroy_bitmap(nuvem2);
+        al_destroy_bitmap(espinho1);
+        return 1;
+    }
+
     ALLEGRO_FONT *font = al_load_font("assets/fonts/LaBelleAurore-Regular.ttf", 50, 0);
     if (!font) {
         al_destroy_bitmap(background);
@@ -78,14 +88,20 @@ int fase_zero(struct mundo *mundo) {
         matarProgramaErro(4);
     }
 
+    ALLEGRO_BITMAP *parado = al_load_bitmap("assets/images/parado.png");
+    ALLEGRO_BITMAP *andando = al_load_bitmap("assets/images/andando.png");
+    ALLEGRO_BITMAP *pulando = al_load_bitmap("assets/images/pulando.png");
+    ALLEGRO_BITMAP *voando  = al_load_bitmap("assets/images/voando.png");
+    ALLEGRO_BITMAP *abaixado = al_load_bitmap("assets/images/abaixado.png");
+
     bool game_done = false;
     float velocidade = 10; // velocidade de movimentação da tela (rolling background)
     // Chão do jogo
     float chao_y = mundo->altura - 200;
 
-
-    struct hitbox *player = cria_hitbox(100, 100, 10, 50, 2, NULL, T_PERSONAGEM);
+    struct hitbox *player = cria_hitbox(100, 100, 100, 100, 2, NULL, T_PERSONAGEM);
     configura_player(player, 2, -10);
+    configura_sprites_player(player,  parado, 1, andando, 4, pulando, 3, voando, 4, abaixado, 1);
     
     // Vetor para armazenar as listas de obstáculos
     struct obstacle *obstaculos[NUM_LISTAS] = {NULL};
@@ -112,26 +128,26 @@ int fase_zero(struct mundo *mundo) {
         
         // Plataforma com espinho encima
         adicionar_obstaculo(&obstaculos[L_NUVEM], cria_hitbox(1200, chao_y, 800, 50, -velocidade, nuvem2, T_NUVEM));
-        adicionar_obstaculo(&obstaculos[L_TEMPESTADE], cria_hitbox(1400, chao_y - player->height / 2 - player->height, 500, player->height / 2 + 10, -velocidade, NULL, T_TEMPESTADE));
+        adicionar_obstaculo(&obstaculos[L_TEMPESTADE], cria_hitbox(1400, chao_y - player->height / 2 - player->height, 500, player->height / 2 + 10, -velocidade, espinho1, T_TEMPESTADE));
 
         adicionar_obstaculo(&obstaculos[L_NUVEM], cria_hitbox(2100, chao_y - 50, 100, 50, -velocidade, nuvem2, T_NUVEM));
 
         // plataforma com um animal
         adicionar_obstaculo(&obstaculos[L_NUVEM], cria_hitbox(2300, chao_y - 250, 500, 50, -velocidade, nuvem2, T_NUVEM));
-        struct hitbox *inimigo = cria_hitbox(2400, chao_y - 300, 50, 50, -velocidade, NULL, T_ANIMAL);
+        struct hitbox *inimigo = cria_hitbox(2400, chao_y - 300, 50, 50, -velocidade, espinho1, T_ANIMAL);
         configura_animal(inimigo, 300, 6); // Patrulha 300px
         adicionar_obstaculo(&obstaculos[L_ANIMAL], inimigo);
 
         // Plataforma longa com prensa
-        adicionar_obstaculo(&obstaculos[L_NUVEM], cria_hitbox(3100, chao_y - 325, 1000, 50, -velocidade, nuvem2, T_NUVEM));
+        adicionar_obstaculo(&obstaculos[L_NUVEM], cria_hitbox(3100, chao_y - 325, 1000, 50, -velocidade, nuvem1, T_NUVEM));
         // jogador precisa esperar a prensa subir para passar
-        struct hitbox *prensa1 = cria_hitbox(3200, chao_y - 850, 150, 300, -velocidade, NULL, T_NUVEM_MOVEL);
+        struct hitbox *prensa1 = cria_hitbox(3200, chao_y - 850, 150, 300, -velocidade, prensa, T_NUVEM_MOVEL);
         configura_nuvem_movel(prensa1, 250, 7); // Sobe 250 pixels
         adicionar_obstaculo(&obstaculos[L_NUVEM_MOVEL], prensa1);
-        struct hitbox *prensa2 = cria_hitbox(3500, chao_y - 850, 150, 300, -velocidade, NULL, T_NUVEM_MOVEL);
+        struct hitbox *prensa2 = cria_hitbox(3500, chao_y - 850, 150, 300, -velocidade, prensa, T_NUVEM_MOVEL);
         configura_nuvem_movel(prensa2, 250, 6); // Sobe 250 pixels
         adicionar_obstaculo(&obstaculos[L_NUVEM_MOVEL], prensa2);
-        struct hitbox *prensa3 = cria_hitbox(3800, chao_y - 850, 150, 300, -velocidade, NULL, T_NUVEM_MOVEL);
+        struct hitbox *prensa3 = cria_hitbox(3800, chao_y - 850, 150, 300, -velocidade, prensa, T_NUVEM_MOVEL);
         configura_nuvem_movel(prensa3, 250, 7); // Sobe 250 pixels
         adicionar_obstaculo(&obstaculos[L_NUVEM_MOVEL], prensa3);
         
@@ -268,8 +284,9 @@ int fase_zero(struct mundo *mundo) {
                 al_draw_scaled_bitmap(background, 0, 0, bg_w, bg_h, -offset_x + bg_w, 0, bg_w, mundo->altura, 0);
                 // TODO: Ver como colocar o fundo para o lado esquerdo
                 
-                // Meu player (temp)
-                al_draw_filled_rectangle(player->x, player->y, player->x + player->width, player->y + player->height, al_map_rgb(255, 0, 0));
+                desenha_personagem(player, 0);
+
+                // al_draw_filled_rectangle(player->x, player->y, player->x + player->width, player->y + player->height, al_map_rgb(255, 0, 0));
     
                 // Desenha todos os obstáculos na tela
                 for (int i = 0; i < NUM_LISTAS; i++) {

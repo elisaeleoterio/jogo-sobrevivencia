@@ -17,7 +17,7 @@ struct hitbox *cria_hitbox(float x, float y, float w, float h, float speed_x, AL
     hit->y = y;
     hit->width = w;
     hit->height = h;
-    hit->sprite = sprite;
+    hit->sprites[OBSTACULOS] = sprite; // Por padrão, é obstáculo
     hit->speed_x = speed_x;
     hit->tipo = tipo;
 
@@ -45,6 +45,20 @@ void configura_player(struct hitbox *hit, float speed_y, float forca_pulo) {
     hit->max_fly = 180; // 180 frames = 3 segundos de voo
     hit->fly_timer = hit->max_fly; // Começa cheio
     hit->def_height = hit->height;
+    hit->frame_delay = 15;
+}
+
+void configura_sprites_player(struct hitbox *p, ALLEGRO_BITMAP *idle, int f_idle, ALLEGRO_BITMAP *walk, int f_walk, ALLEGRO_BITMAP *jump,
+                             int f_jump, ALLEGRO_BITMAP *fly, int f_fly, ALLEGRO_BITMAP *crouch, int f_crouch) {
+    if (!p) {
+        matar_pont_nulo();
+    }
+    
+    p->sprites[S_IDLE] = idle;      p->max_frames[S_IDLE] = f_idle;
+    p->sprites[S_WALK] = walk;      p->max_frames[S_WALK] = f_walk;
+    p->sprites[S_JUMP] = jump;      p->max_frames[S_JUMP] = f_jump;
+    p->sprites[S_FLY] = fly;        p->max_frames[S_FLY] = f_fly;
+    p->sprites[S_CROUCH] = crouch;  p->max_frames[S_CROUCH] = f_crouch;
 }
 
 void configura_animal(struct hitbox *obs, float distancia, float velocidade_propria) {
@@ -107,10 +121,19 @@ int verifica_colisao(struct hitbox *a, struct hitbox *b) {
 }
 
 // Altera as propriedade da hitbox para que se movimente
-// TODO: VER SPRITES
 void movimenta_hitbox(struct hitbox *a, ALLEGRO_KEYBOARD_STATE key) {
+    if (!a) {
+        matar_pont_nulo();
+    }
+    
+    bool andando = false;
+    bool agachado = false;
+    bool voando = false;
+
     if (al_key_down(&key, ALLEGRO_KEY_RIGHT)) {
         a->x += a->speed_x;
+        a->direction = 1; // Virado para direita
+        andando =  true;
 
         if (a->tipo == T_ANIMAL) {
             a->min_x += a->speed_x;
@@ -120,6 +143,8 @@ void movimenta_hitbox(struct hitbox *a, ALLEGRO_KEYBOARD_STATE key) {
     }
     if (al_key_down(&key, ALLEGRO_KEY_LEFT)) {
         a->x -= a->speed_x;
+        a->direction = -1; // Virado para esquerda
+        andando = true;
 
         if (a->tipo == T_ANIMAL) {
             a->min_x -= a->speed_x;
@@ -127,9 +152,9 @@ void movimenta_hitbox(struct hitbox *a, ALLEGRO_KEYBOARD_STATE key) {
         }
         a->steps--;  
     }
-    // bool agachado = false;
+
+    // Só agacha se estiver no chão
     if (al_key_down(&key, ALLEGRO_KEY_DOWN) && a->chao) {
-        // Só agacha se estiver no chão
         // Se ainda está em pé, agacha
         if (a->height == a->def_height) {
             float metade_altura = a->def_height / 2.0;
@@ -137,31 +162,72 @@ void movimenta_hitbox(struct hitbox *a, ALLEGRO_KEYBOARD_STATE key) {
             a->y += (a->def_height - metade_altura); 
             a->height = metade_altura;
         }
-        // agachado = true;
+        agachado = true;
     } else {
-        // LEVANTAR
         // Se soltou a tecla e está agachado (altura menor que o padrão)
         if (a->height < a->def_height) {
             // Ajusta o Y para crescer
             a->y -= (a->def_height - a->height);
             a->height = a->def_height;
-            // agachado = false;
+            agachado = false;
         }
     }
+    
+    // PULO
     if (al_key_down(&key, ALLEGRO_KEY_UP) && a->chao) {
         a->speed_y += a->forca_pulo;
         a->chao = false; 
     }
+    
+    // VOO
     if (al_key_down(&key, ALLEGRO_KEY_SPACE) && a->fly_timer > 0) {
         a->speed_y = -5;
         a->fly_timer--;
         a->chao = false;
+        voando = true;
     }
+
     // Recarregar combustível se estiver no chão
     if (a->chao && a->fly_timer < a->max_fly) {
         a->fly_timer += 0.1;
         if (a->fly_timer > a->max_fly) {
             a->fly_timer = a->max_fly;
+        }
+    }
+
+    int novo_estado = S_IDLE;
+    
+    if (voando) {
+         novo_estado = S_FLY;
+    } else if (!a->chao) {
+        novo_estado = S_JUMP;
+    } else if (agachado) {
+        novo_estado = S_CROUCH;
+    } else if (andando) {
+        novo_estado = S_WALK;
+    } else{
+        novo_estado = S_IDLE;
+    };
+
+    // Se mudou de estado, reseta a animação para o frame 0
+    if (novo_estado != a->current_state) {
+        a->current_state = novo_estado;
+        a->current_frame = 0;
+        a->frame_timer = 0;
+    }
+
+    // atualiza o frame
+    // Incrementa o timer
+    a->frame_timer++;
+    if (a->frame_timer >= a->frame_delay) {
+        a->frame_timer = 0;
+        
+        // Passa para o próximo frame
+        a->current_frame++;
+        
+        // Se chegou no final da tira de imagens, volta para o começo (loop)
+        if (a->current_frame >= a->max_frames[a->current_state]) {
+            a->current_frame = 0;
         }
     }
 }
@@ -171,7 +237,7 @@ void desenha_hitbox(struct hitbox *a) {
         matar_pont_nulo();
     }
 
-    if (!a->sprite) {
+    if (!a->sprites[0]) {
         return;
     }
 
@@ -187,7 +253,42 @@ void desenha_hitbox(struct hitbox *a) {
 
     // O Sprite deve ser desenhado da origem dele (0,0) até sua largura/altura total
     // E ser colocado na posição de destino (dest_x, dest_y)
-    al_draw_scaled_bitmap(a->sprite, 0, 0, al_get_bitmap_width(a->sprite), al_get_bitmap_height(a->sprite), a->x - ajuste_lateral, a->y - offset_topo, a->width + ajuste_lateral * 2, a->height + offset_topo + offset_base, 0);
+    al_draw_scaled_bitmap(a->sprites[0], 0, 0, al_get_bitmap_width(a->sprites[0]), al_get_bitmap_height(a->sprites[0]), a->x - ajuste_lateral, a->y - offset_topo, a->width + ajuste_lateral * 2, a->height + offset_topo + offset_base, 0);
+}
+
+void desenha_personagem(struct hitbox *p, int flag) {
+    if (!p) {
+        matar_pont_nulo();
+    }
+    
+    ALLEGRO_BITMAP *sprite_to_draw = p->sprites[p->current_state];
+    
+    // Se não tiver sprite usa o IDLE
+    int frames_count = p->max_frames[p->current_state];
+    if (!sprite_to_draw) {
+        sprite_to_draw = p->sprites[S_IDLE];
+        frames_count = p->max_frames[S_IDLE];
+        
+        if (!sprite_to_draw) {
+            return;
+        }
+    }
+    
+
+    // Calcula as dimensões de UM frame individual
+    int frame_width = al_get_bitmap_width(sprite_to_draw) / frames_count;
+    int frame_height = al_get_bitmap_height(sprite_to_draw);
+
+    int draw_flags = flag;
+    if (p->direction == -1) {
+        draw_flags = ALLEGRO_FLIP_HORIZONTAL;
+    }
+
+    // Desenha apenas o pedaço (Region) correspondente ao frame atual
+    al_draw_scaled_bitmap(sprite_to_draw, frame_width * p->current_frame, 0, frame_width, frame_height, p->x, p->y, p->width, p->height, draw_flags);
+
+    // al_draw_scaled_bitmap(sprite_to_draw, frame_width * p->current_frame, 0, frame_width, frame_height,
+    //                     100, 100, 200, 200, draw_flags);
 }
 
 void destruir_hitbox(struct hitbox *a) {

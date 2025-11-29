@@ -17,6 +17,7 @@ enum {
     L_PRENSA,
     L_TEMPESTADE,
     L_FIM,
+    L_VIDA,
     NUM_LISTAS,
 };
 
@@ -30,6 +31,7 @@ enum {
     T_NUVEM_MOVEL,
     T_TEMPESTADE,
     T_FIM,
+    T_VIDA,
 };
 
 // Enumeração dos Estados do Player (Sprites)

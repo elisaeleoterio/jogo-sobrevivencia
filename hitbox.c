@@ -54,11 +54,16 @@ void configura_sprites_player(struct hitbox *p, ALLEGRO_BITMAP *idle, int f_idle
         matar_pont_nulo();
     }
     
-    p->sprites[S_IDLE] = idle;      p->max_frames[S_IDLE] = f_idle;
-    p->sprites[S_WALK] = walk;      p->max_frames[S_WALK] = f_walk;
-    p->sprites[S_JUMP] = jump;      p->max_frames[S_JUMP] = f_jump;
-    p->sprites[S_FLY] = fly;        p->max_frames[S_FLY] = f_fly;
-    p->sprites[S_CROUCH] = crouch;  p->max_frames[S_CROUCH] = f_crouch;
+    p->sprites[S_IDLE] = idle;
+    p->max_frames[S_IDLE] = f_idle;
+    p->sprites[S_WALK] = walk;
+    p->max_frames[S_WALK] = f_walk;
+    p->sprites[S_JUMP] = jump;
+    p->max_frames[S_JUMP] = f_jump;
+    p->sprites[S_FLY] = fly;
+    p->max_frames[S_FLY] = f_fly;
+    p->sprites[S_CROUCH] = crouch;
+    p->max_frames[S_CROUCH] = f_crouch;
 }
 
 void configura_animal(struct hitbox *obs, float distancia, float velocidade_propria) {
@@ -120,7 +125,7 @@ int verifica_colisao(struct hitbox *a, struct hitbox *b) {
     return 1;    
 }
 
-// Altera as propriedade da hitbox para que se movimente
+// Altera as propriedade da hitbox para que se movimente e verifica qual sprite utilizar
 void movimenta_hitbox(struct hitbox *a, ALLEGRO_KEYBOARD_STATE key) {
     if (!a) {
         matar_pont_nulo();
@@ -241,18 +246,12 @@ void desenha_hitbox(struct hitbox *a) {
         return;
     }
 
-    // offset_topo: "sobe" visualmente.
     float offset_topo = 15.0; 
-    float offset_base = 10.0;  // Estende a imagem um pouco para baixo
+    float offset_base = 10.0;
 
-    // ajuste_lateral: Controla a largura visual
-    //   > 0 (Positivo): Alarga a imagem (borda extra)
-    //   < 0 (Negativo): Estreita a imagem (encolhe visualmente)
-    //   = 0 (Zero): Largura exata da hitbox
-    float ajuste_lateral = 30.0; // Deixa 5 pixels mais estreito de cada lado
+    // alarga a imagem (borda extra)
+    float ajuste_lateral = 30.0; 
 
-    // O Sprite deve ser desenhado da origem dele (0,0) até sua largura/altura total
-    // E ser colocado na posição de destino (dest_x, dest_y)
     al_draw_scaled_bitmap(a->sprites[0], 0, 0, al_get_bitmap_width(a->sprites[0]), al_get_bitmap_height(a->sprites[0]), a->x - ajuste_lateral, a->y - offset_topo, a->width + ajuste_lateral * 2, a->height + offset_topo + offset_base, 0);
 }
 
@@ -275,7 +274,7 @@ void desenha_personagem(struct hitbox *p, int flag) {
     }
     
 
-    // Calcula as dimensões de UM frame individual
+    // calcula as dimensões de um frame
     int frame_width = al_get_bitmap_width(sprite_to_draw) / frames_count;
     int frame_height = al_get_bitmap_height(sprite_to_draw);
 
@@ -284,11 +283,8 @@ void desenha_personagem(struct hitbox *p, int flag) {
         draw_flags = ALLEGRO_FLIP_HORIZONTAL;
     }
 
-    // Desenha apenas o pedaço (Region) correspondente ao frame atual
+    // desenha o pedaço do frame atual
     al_draw_scaled_bitmap(sprite_to_draw, frame_width * p->current_frame, 0, frame_width, frame_height, p->x, p->y, p->width, p->height, draw_flags);
-
-    // al_draw_scaled_bitmap(sprite_to_draw, frame_width * p->current_frame, 0, frame_width, frame_height,
-    //                     100, 100, 200, 200, draw_flags);
 }
 
 void destruir_hitbox(struct hitbox *a) {
@@ -304,17 +300,16 @@ void atualiza_animal(struct hitbox *obs) {
         return;
     }
 
-    // Move baseado na velocidade própria e direção atual
     obs->x += obs->mov_speed * obs->mov_direcao;
 
     // Verifica limites e inverte a direção
     if (obs->x <= obs->min_x) {
         obs->x = obs->min_x;
-        obs->mov_direcao = 1; // Vira para direita
+        obs->mov_direcao = 1;
     }
     else if (obs->x >= obs->max_x) {
         obs->x = obs->max_x;
-        obs->mov_direcao = -1; // Vira para esquerda
+        obs->mov_direcao = -1;
     }
 }
 
@@ -324,7 +319,6 @@ void atualiza_nuvem_movel(struct hitbox *obs) {
         return;
     }
 
-    // Move baseado na velocidade própria e direção atual
     obs->y += obs->mov_speed * obs->mov_direcao;
 
     // Verifica limites e inverte a direção

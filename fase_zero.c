@@ -102,6 +102,19 @@ int fase_zero(struct mundo *mundo) {
         al_destroy_bitmap(animal);
         matar_falta_memoria();
     }
+    ALLEGRO_BITMAP *vida_extra = al_load_bitmap("assets/images/vida_extra.png");
+    if (!fim) {
+        al_destroy_bitmap(background);
+        al_destroy_bitmap(vida);
+        al_destroy_bitmap(nuvem);
+        al_destroy_bitmap(tempestade);
+        al_destroy_bitmap(espinho1);
+        al_destroy_bitmap(espinho2);
+        al_destroy_bitmap(prensa);
+        al_destroy_bitmap(animal);
+        al_destroy_bitmap(fim);
+        matar_falta_memoria();
+    }
 
     ALLEGRO_FONT *font = al_load_font("assets/fonts/LaBelleAurore-Regular.ttf", 50, 0);
     if (!font) {
@@ -206,6 +219,8 @@ int fase_zero(struct mundo *mundo) {
 
         // estrela troféu do jogo
         adicionar_obstaculo(&obstaculos[L_FIM], cria_hitbox(7800, chao_y - 200, 70, 70, -velocidade, fim, T_FIM));
+        // item coletável que aumenta vida
+        adicionar_obstaculo(&obstaculos[L_VIDA], cria_hitbox(4800, chao_y - 400, 20, 20, -velocidade, vida_extra, T_VIDA));
     
         float back_x = 0; // variável para controlar a posição do fundo
         bool redraw = true;
@@ -250,8 +265,15 @@ int fase_zero(struct mundo *mundo) {
 
                     // Se encostar na estrela, finaliza o jogo
                     if (verifica_colisao(player, obstaculos[L_FIM]->hitbox)) {
+                        obstaculos[L_FIM] = NULL;
                         return 0;
                     }
+
+                    if (colide_obs(player, obstaculos[L_VIDA])) {
+                        player->life++;
+                        obstaculos[L_VIDA] = NULL;
+                    }
+                    
 
                     // Verifica colisão no eixo x para alterar a movimentação
                     bool mundo_parou = false;

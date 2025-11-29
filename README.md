@@ -1,24 +1,23 @@
 # TO-DO:
-[ ] Implementar fundo
-[ ] Como colocar sprites
-[ ] Definir obstáculos
-[ ] Menu
-    [ ] Aumentar fonte
-    [ ] Escalonar fundo
-    [ ] Lógica dos botão
-[ ] Função modular de verificação de colisão
-[ ] Ver como que funciona gravidade pro boneco pular
-[ ] Ajeitar sprites
-[ ] Ver como carregar obstáculos
+[x] Implementar fundo
+[x] Como colocar sprites
+[x] Definir obstáculos
+[x] Menu
+    [x] Aumentar fonte
+    [x] Escalonar fundo
+    [x] Lógica dos botão
+[x] Função modular de verificação de colisão
+[x] Ver como que funciona gravidade pro boneco pular
+[x] Ajeitar sprites
+[x] Ver como carregar obstáculos
     - Tem que aparecer ao poucos, quando o jogador estiver no passo x
-[ ] Criar movimentação abaixado
-[ ] 3 Obstáculos
+[x] Criar movimentação abaixado
+[x] 3 Obstáculos
     [x] Tempestade (nuvem em cima)
     [x] Animal que se move
     [x] Prensa
     [x] Nuvem que aparece e desaparece (usar buraco)
     [x] Espinhos
-    [ ] Raios verticais
     [x] Nuvem que tem que passar por baixo
 [x] Movimentação de abaixar
 [x] Tela de Game Over
@@ -28,7 +27,6 @@
     [x] Fundo
     [x] Obstáculos
 [x] Colocar estrela de fim
-[ ] Textinho inicial de história
 [x] Player voar
 [x] Sistema de vida (deixar sprites visíveis)
 [x] Organizar código
@@ -46,7 +44,7 @@ para passar por áreas baixas.
 [x][2],15 pts, Implementar, pelo menos, um segundo tipo de obstáculo dinâmico
 inédito, diferente dos requisitos mínimos (ex: plataformas que caem ou
 desmoronam)
-[ ][11],5 pts, Item coletável que aumenta a barra de vida.
+[x][11],5 pts, Item coletável que aumenta a barra de vida.
 
 # REQUISITOS MÍNIMOS
 
@@ -97,4 +95,4 @@ combate.
 [x] Arrumar sprite de fundo
 [x] Arrumar saída na tela pause
 [x] Arrumar lateral da sprite do sapo
-[ ] Revisar hitbox.c
+[x] Revisar hitbox.c
